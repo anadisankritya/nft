@@ -4,13 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
-import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
-
-
 @Getter
 @AllArgsConstructor
 public enum ErrorCode {
-  OPEN_SEARCH_ADD_FAILED("8401", INTERNAL_SERVER_ERROR, "Error while adding data to OpenSearch Index");
+  EMAIL_ALREADY_EXISTS("101", HttpStatus.NOT_ACCEPTABLE, "User with same email already exists"),
+  DUPLICATE_USER_CODE("102", HttpStatus.CONFLICT, "User with same user code already exists");
+
 
   private final String code;
   private final HttpStatus httpStatus;

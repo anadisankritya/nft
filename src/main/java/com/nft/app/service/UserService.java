@@ -1,11 +1,15 @@
 package com.nft.app.service;
 
 import com.nft.app.entity.User;
+import com.nft.app.exception.ErrorCode;
+import com.nft.app.exception.NftException;
+import com.nft.app.exception.UserCodeException;
 import com.nft.app.repository.UserRepository;
 import com.nft.app.util.AlphabeticalCodeGenerator;
 import com.nft.app.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
@@ -21,6 +25,7 @@ public class UserService {
   private final JwtUtil jwtUtil;
   private final EmailService emailService;
 
+  @Retryable(retryFor = UserCodeException.class)
   public void registerUser(User user) {
     log.info("inside UserService::registerUser for email - {}", user.getEmail());
 
@@ -29,12 +34,12 @@ public class UserService {
     log.info("email - {} , generated userCode - {}", user.getEmail(), userCode);
 
     if (userRepository.findByEmail(user.getEmail()).isPresent()) {
-      throw new RuntimeException("Email already exists");
+      throw new NftException(ErrorCode.EMAIL_ALREADY_EXISTS);
     }
-    if (userRepository.findByUserCode(user.getUserCode()).isPresent()) {
-      throw new RuntimeException("Something went wrong");
+    if (userRepository.existsByUserCode(user.getUserCode())) {
+      throw new UserCodeException(ErrorCode.DUPLICATE_USER_CODE);
     }
-    emailService.sendOtpEmail(user.getEmail());
+    emailService.sendEmailOtp(user.getEmail());
     userRepository.save(user);
   }
 

@@ -16,16 +16,12 @@ import java.util.Base64;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "user")
-public class User {
+@Document(collection = "emailOtp")
+public class EmailOtp {
   @Id
   private String id;
-  private String username;
   private String email;
-  private String password;
-  private String userCode;
-  private String referralCode;
-  private boolean verified;
+  private String otp;
 
   @CreatedDate
   private LocalDateTime createdDate;
@@ -33,11 +29,9 @@ public class User {
   @LastModifiedDate
   private LocalDateTime updatedDate;
 
-  public User(UserRequest userRequest) {
-    this.username = userRequest.username();
-    this.email = userRequest.email();
-    this.password = Base64.getEncoder().
-        encodeToString(userRequest.password().getBytes(StandardCharsets.UTF_8));
-    this.referralCode = userRequest.referralCode();
+
+  public EmailOtp(String email, String otp){
+    this.email = email;
+    this.otp = otp;
   }
 }
