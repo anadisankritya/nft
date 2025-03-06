@@ -1,12 +1,16 @@
 package com.nft.app.service;
 
+import com.nft.app.dto.UserRequest;
+import com.nft.app.entity.EmailOtp;
 import com.nft.app.entity.User;
 import com.nft.app.exception.ErrorCode;
 import com.nft.app.exception.NftException;
 import com.nft.app.exception.UserCodeException;
+import com.nft.app.repository.EmailOtpRepository;
 import com.nft.app.repository.UserRepository;
 import com.nft.app.util.AlphabeticalCodeGenerator;
 import com.nft.app.util.JwtUtil;
+import com.nft.app.util.OtpGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.retry.annotation.Retryable;
@@ -24,23 +28,53 @@ public class UserService {
   private final UserRepository userRepository;
   private final JwtUtil jwtUtil;
   private final EmailService emailService;
+  private final EmailOtpRepository emailOtpRepository;
+
+  public void sendEmailOtp(String email) {
+    log.info("inside UserService::sendEmailOtp for email - {}", email);
+
+    if (userRepository.findByEmail(email).isPresent()) {
+      throw new NftException(ErrorCode.EMAIL_ALREADY_EXISTS);
+    }
+
+    String otp = OtpGenerator.generateSixDigitOtp();
+    emailService.sendEmailOtp(email, otp);
+    saveEmailOtp(email, otp);
+  }
+
+  private void saveEmailOtp(String email, String otp) {
+    EmailOtp emailOtp = new EmailOtp(email, otp);
+    Optional<EmailOtp> emailOtpOptional = emailOtpRepository.findByEmail(email);
+    if (emailOtpOptional.isPresent()) {
+      emailOtp = emailOtpOptional.get();
+      emailOtp.setOtp(otp);
+    }
+    emailOtpRepository.save(emailOtp);
+  }
 
   @Retryable(retryFor = UserCodeException.class)
-  public void registerUser(User user) {
-    log.info("inside UserService::registerUser for email - {}", user.getEmail());
+  public void registerUser(UserRequest userRequest) {
+    log.info("inside UserService::registerUser for email - {}", userRequest.email());
 
+    User user = new User(userRequest);
     String userCode = AlphabeticalCodeGenerator.generateSixLetterCode();
     user.setUserCode(userCode);
-    log.info("email - {} , generated userCode - {}", user.getEmail(), userCode);
 
-    if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+    String email = user.getEmail();
+    log.info("email - {} , generated userCode - {}", email, userCode);
+
+    emailService.verifyOtp(email, userRequest.otp());
+    verifyUserDetails(email, user);
+    userRepository.save(user);
+  }
+
+  private void verifyUserDetails(String email, User user) {
+    if (userRepository.findByEmail(email).isPresent()) {
       throw new NftException(ErrorCode.EMAIL_ALREADY_EXISTS);
     }
     if (userRepository.existsByUserCode(user.getUserCode())) {
       throw new UserCodeException(ErrorCode.DUPLICATE_USER_CODE);
     }
-    emailService.sendEmailOtp(user.getEmail());
-    userRepository.save(user);
   }
 
   public String loginUser(String email, String password) {
@@ -58,4 +92,5 @@ public class UserService {
     }
     throw new RuntimeException("Invalid credentials");
   }
+
 }

@@ -30,7 +30,7 @@ public class EmailOtp {
   private LocalDateTime updatedDate;
 
 
-  public EmailOtp(String email, String otp){
+  public EmailOtp(String email, String otp) {
     this.email = email;
     this.otp = otp;
   }
