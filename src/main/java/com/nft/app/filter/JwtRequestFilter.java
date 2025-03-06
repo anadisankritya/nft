@@ -18,6 +18,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @Component
@@ -25,6 +26,10 @@ import java.util.ArrayList;
 public class JwtRequestFilter extends OncePerRequestFilter {
 
   private final JwtUtil jwtUtil;
+  private static final List<String> BYPASS_URI_LIST = List.of(
+      "/register/api/v1/send-otp",
+      "/register/api/v1//signup"
+  );
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
@@ -63,8 +68,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     String requestURI = request.getRequestURI();
     String host = request.getHeader("host");
     log.info("checking shouldNotFilter for URI - {}, host - {}", requestURI, host);
-    String bypassUri = "/nft/api/auth/signup";
-    return pathMatcher.match(bypassUri, requestURI);
+    return BYPASS_URI_LIST.stream().anyMatch(bypassUri -> pathMatcher.match(bypassUri, requestURI));
   }
 
 }

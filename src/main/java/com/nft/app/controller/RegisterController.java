@@ -1,5 +1,6 @@
 package com.nft.app.controller;
 
+import com.nft.app.dto.NftResponse;
 import com.nft.app.dto.UserRequest;
 import com.nft.app.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -11,25 +12,25 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/register")
+@RequestMapping("/register/api/v1")
 @RequiredArgsConstructor
 public class RegisterController {
 
   private final UserService userService;
 
   @PostMapping("/send-otp")
-  public ResponseEntity<?> sendOtp(@RequestParam String email) {
+  public ResponseEntity<NftResponse<String>> sendOtp(@RequestParam String email) {
     userService.sendEmailOtp(email);
-    return ResponseEntity.ok("Otp sent");
+    return ResponseEntity.ok(new NftResponse<>("Otp sent"));
   }
 
   @PostMapping("/signup")
-  public ResponseEntity<?> signup(@RequestBody UserRequest userRequest) {
+  public ResponseEntity<NftResponse<String>> signup(@RequestBody UserRequest userRequest) {
     try {
       userService.registerUser(userRequest);
-      return ResponseEntity.ok("user registered");
+      return ResponseEntity.ok(new NftResponse<>("user registered"));
     } catch (Exception e) {
-      return ResponseEntity.badRequest().body(e.getMessage());
+      return ResponseEntity.badRequest().body(new NftResponse<>(e.getMessage()));
     }
   }
 

@@ -1,5 +1,6 @@
 package com.nft.app.service;
 
+import com.nft.app.dto.UserDetailsResponse;
 import com.nft.app.dto.UserRequest;
 import com.nft.app.entity.EmailOtp;
 import com.nft.app.entity.User;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -104,6 +106,10 @@ public class UserService {
       }
     }
     throw new NftException(ErrorCode.INVALID_OTP);
+  }
+
+  public List<?> getUserReferralList(String userCode) {
+    return userRepository.findByReferralCodeOrderByCreatedDateDesc(userCode).stream().map(UserDetailsResponse::new).toList();
   }
 
 }

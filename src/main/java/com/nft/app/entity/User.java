@@ -25,7 +25,6 @@ public class User {
   private String password;
   private String userCode;
   private String referralCode;
-  private boolean verified;
 
   @CreatedDate
   private LocalDateTime createdDate;
