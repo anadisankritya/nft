@@ -108,8 +108,13 @@ public class UserService {
     throw new NftException(ErrorCode.INVALID_OTP);
   }
 
-  public List<?> getUserReferralList(String userCode) {
-    return userRepository.findByReferralCodeOrderByCreatedDateDesc(userCode).stream().map(UserDetailsResponse::new).toList();
+  public List<?> getUserReferralList(String email) {
+    Optional<User> userOptional = userRepository.findByEmail(email);
+    if (userOptional.isPresent()) {
+      String userCode = userOptional.get().getUserCode();
+      return userRepository.findByReferralCodeOrderByCreatedDateDesc(userCode).stream().map(UserDetailsResponse::new).toList();
+    }
+    throw new NftException(ErrorCode.USER_NOT_FOUND);
   }
 
 }

@@ -28,7 +28,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
   private final JwtUtil jwtUtil;
   private static final List<String> BYPASS_URI_LIST = List.of(
       "/register/api/v1/send-otp",
-      "/register/api/v1//signup"
+      "/register/api/v1/signup"
   );
 
   @Override
