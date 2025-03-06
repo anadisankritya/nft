@@ -63,7 +63,7 @@ public class UserService {
     String email = user.getEmail();
     log.info("email - {} , generated userCode - {}", email, userCode);
 
-    emailService.verifyOtp(email, userRequest.otp());
+    verifyOtp(email, userRequest.otp());
     verifyUserDetails(email, user);
     userRepository.save(user);
   }
@@ -91,6 +91,19 @@ public class UserService {
       }
     }
     throw new RuntimeException("Invalid credentials");
+  }
+
+  private void verifyOtp(String email, String otp) {
+    log.info("inside UserService::verifyOtp for email - {}", email);
+    Optional<EmailOtp> emailOtpOptional = emailOtpRepository.findByEmail(email);
+    if (emailOtpOptional.isPresent()) {
+      EmailOtp emailOtp = emailOtpOptional.get();
+      if (emailOtp.getOtp().equals(otp)) {
+        log.info("Otp verified for email - {}", email);
+        return;
+      }
+    }
+    throw new NftException(ErrorCode.INVALID_OTP);
   }
 
 }

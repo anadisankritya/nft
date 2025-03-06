@@ -19,7 +19,6 @@ import java.util.Optional;
 public class EmailService {
 
   private final JavaMailSender mailSender;
-  private final EmailOtpRepository emailOtpRepository;
 
   public void sendEmailOtp(String email, String otp) {
     log.info("inside EmailService::sendEmailOtp for email - {}", email);
@@ -33,19 +32,6 @@ public class EmailService {
       log.error("Exception in sendEmailOtp", e);
       throw e;
     }
-  }
-
-  public void verifyOtp(String email, String otp) {
-    log.info("inside EmailService::verifyOtp for email - {}", email);
-    Optional<EmailOtp> emailOtpOptional = emailOtpRepository.findByEmail(email);
-    if (emailOtpOptional.isPresent()) {
-      EmailOtp emailOtp = emailOtpOptional.get();
-      if (emailOtp.getOtp().equals(otp)) {
-        log.info("Otp verified for email - {}", email);
-        return;
-      }
-    }
-    throw new NftException(ErrorCode.INVALID_OTP);
   }
 
 
