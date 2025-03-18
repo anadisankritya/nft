@@ -43,8 +43,9 @@ public class UserService {
     }
 
     String otp = OtpGenerator.generateSixDigitOtp();
-    emailService.sendEmailOtp(email, otp);
+//    emailService.sendEmailOtp(email, otp);
     saveOtp(email, otp, EMAIL);
+    log.info("email otp sent {}", otp);
   }
 
   private void saveOtp(String key, String otp, String type) {
@@ -63,7 +64,7 @@ public class UserService {
     log.info("inside UserService::registerUser for email - {}", userRequest.email());
 
     User user = new User(userRequest);
-    String userCode = AlphabeticalCodeGenerator.generateSixLetterCode();
+    String userCode = AlphabeticalCodeGenerator.generateEightLetterCode();
     user.setUserCode(userCode);
 
     String email = user.getEmail();
@@ -157,7 +158,9 @@ public class UserService {
     log.info("inside UserService::sendMobileOtp for mobileNo - {}", mobileNo);
     String otp = OtpGenerator.generateSixDigitOtp();
     saveOtp(mobileNo.toString(), otp, MOBILE);
-    String smsResponse = smsService.sendSms(otp, mobileNo);
+//    String smsResponse = smsService.sendSms(otp, mobileNo);
+    String smsResponse = "otp sent " + otp;
+
     log.info("mobileNo - {}, sendSms response - {}", mobileNo, smsResponse);
   }
 

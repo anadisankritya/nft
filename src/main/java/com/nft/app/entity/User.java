@@ -25,6 +25,7 @@ public class User {
   private String password;
   private String userCode;
   private String referralCode;
+  private Integer phoneNo;
 
   @CreatedDate
   private LocalDateTime createdDate;
@@ -38,5 +39,6 @@ public class User {
     this.password = Base64.getEncoder().
         encodeToString(userRequest.password().getBytes(StandardCharsets.UTF_8));
     this.referralCode = userRequest.referralCode();
+    this.phoneNo = userRequest.phoneNo();
   }
 }

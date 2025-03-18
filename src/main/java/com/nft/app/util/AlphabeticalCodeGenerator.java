@@ -9,9 +9,9 @@ public class AlphabeticalCodeGenerator {
   private static final SecureRandom random = new SecureRandom();
   private static final String LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-  public static String generateSixLetterCode() {
+  public static String generateEightLetterCode() {
     StringBuilder code = new StringBuilder(6);
-    for (int i = 0; i < 6; i++) {
+    for (int i = 0; i < 8; i++) {
       int index = random.nextInt(LETTERS.length());
       code.append(LETTERS.charAt(index));
     }

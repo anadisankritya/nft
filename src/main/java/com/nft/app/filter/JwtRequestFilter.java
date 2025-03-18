@@ -1,6 +1,8 @@
 package com.nft.app.filter;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.nft.app.exception.ErrorCode;
+import com.nft.app.exception.NftException;
 import com.nft.app.util.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -27,8 +29,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
   private final JwtUtil jwtUtil;
   private static final List<String> BYPASS_URI_LIST = List.of(
-      "/register/api/v1/send-emailOtp",
-      "/register/api/v1/signup"
+      "/nft/register/api/v1/send-email-otp",
+      "/nft/register/api/v1/send-phone-otp",
+      "/nft/register/api/v1/signup"
   );
 
   @Override
@@ -37,15 +40,17 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
     final String token = request.getHeader("Authorization");
 
-    String email = null;
+    String email;
 
-    if (token != null) {
-      try {
-        email = jwtUtil.extractEmail(token);
-      } catch (JWTVerificationException e) {
-        logger.error("Token verification failed", e);
-        throw new RuntimeException("Unable to extract token");
-      }
+    if (token == null) {
+      throw new NftException(ErrorCode.GENERIC_EXCEPTION);
+    }
+
+    try {
+      email = jwtUtil.extractEmail(token);
+    } catch (JWTVerificationException e) {
+      logger.error("Token verification failed", e);
+      throw new RuntimeException("Unable to extract token");
     }
 
     if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -59,6 +64,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         throw new RuntimeException("Invalid token");
       }
     }
+
     chain.doFilter(request, response);
   }
 

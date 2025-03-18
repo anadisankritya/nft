@@ -24,6 +24,12 @@ public class RegisterController {
     return ResponseEntity.ok(new NftResponse<>("OTP sent"));
   }
 
+  @PostMapping("/send-phone-otp")
+  public ResponseEntity<NftResponse<String>> sendPhoneOtp(@RequestParam Integer mobileNo) {
+    userService.sendMobileOtp(mobileNo);
+    return ResponseEntity.ok(new NftResponse<>("OTP sent"));
+  }
+
   @PostMapping("/signup")
   public ResponseEntity<NftResponse<String>> signup(@RequestBody UserRequest userRequest) {
     try {
@@ -52,12 +58,6 @@ public class RegisterController {
     } catch (Exception e) {
       return ResponseEntity.badRequest().body(new NftResponse<>(e.getMessage()));
     }
-  }
-
-  @PostMapping("/send-phone-otp")
-  public ResponseEntity<NftResponse<String>> sendPhoneOtp(@RequestParam Integer mobileNo) {
-    userService.sendMobileOtp(mobileNo);
-    return ResponseEntity.ok(new NftResponse<>("OTP sent"));
   }
 
 }
