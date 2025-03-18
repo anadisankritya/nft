@@ -18,20 +18,46 @@ public class RegisterController {
 
   private final UserService userService;
 
-  @PostMapping("/send-otp")
-  public ResponseEntity<NftResponse<String>> sendOtp(@RequestParam String email) {
+  @PostMapping("/send-email-otp")
+  public ResponseEntity<NftResponse<String>> sendEmailOtp(@RequestParam String email) {
     userService.sendEmailOtp(email);
-    return ResponseEntity.ok(new NftResponse<>("Otp sent"));
+    return ResponseEntity.ok(new NftResponse<>("OTP sent"));
   }
 
   @PostMapping("/signup")
   public ResponseEntity<NftResponse<String>> signup(@RequestBody UserRequest userRequest) {
     try {
       userService.registerUser(userRequest);
-      return ResponseEntity.ok(new NftResponse<>("user registered"));
+      return ResponseEntity.ok(new NftResponse<>("User registered"));
     } catch (Exception e) {
       return ResponseEntity.badRequest().body(new NftResponse<>(e.getMessage()));
     }
+  }
+
+  @PostMapping("/reset-password")
+  public ResponseEntity<NftResponse<String>> resetPassword(@RequestParam String email) {
+    try {
+      userService.sendPasswordResetOtp(email);
+      return ResponseEntity.ok(new NftResponse<>("Password reset emailOtp sent"));
+    } catch (Exception e) {
+      return ResponseEntity.badRequest().body(new NftResponse<>(e.getMessage()));
+    }
+  }
+
+  @PostMapping("/update-password")
+  public ResponseEntity<NftResponse<String>> updatePassword(@RequestBody UserRequest userRequest) {
+    try {
+      userService.updatePassword(userRequest);
+      return ResponseEntity.ok(new NftResponse<>("Password updated"));
+    } catch (Exception e) {
+      return ResponseEntity.badRequest().body(new NftResponse<>(e.getMessage()));
+    }
+  }
+
+  @PostMapping("/send-phone-otp")
+  public ResponseEntity<NftResponse<String>> sendPhoneOtp(@RequestParam Integer mobileNo) {
+    userService.sendMobileOtp(mobileNo);
+    return ResponseEntity.ok(new NftResponse<>("OTP sent"));
   }
 
 }

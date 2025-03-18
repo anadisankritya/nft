@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: nft
+  servlet:
+    context-path: /nft
+  data:
+    mongodb:
+      uri: mongodb://root:secret@localhost:27017/nftdb
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: abc
+    password: xyz
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+
+server:
+  port: 8080
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+
+
+sms:
+  api:
+    url: "https://api.textlocal.in/send/"
+    key: "yourApiKey"
+  sender: "TXTLCL"

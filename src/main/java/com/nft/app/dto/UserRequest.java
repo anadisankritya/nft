@@ -5,7 +5,9 @@ public record UserRequest(
     String username,
     String email,
     String password,
+    Integer phoneNo,
     String referralCode,
-    String otp
+    String emailOtp,
+    String smsOtp
 ) {
 }

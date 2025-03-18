@@ -11,6 +11,6 @@ public class UserDetailsResponse {
 
   public UserDetailsResponse(User user) {
     this.userName = user.getUsername();
-    this.email = user.getEmail();
+//    this.email = user.getEmail();
   }
 }

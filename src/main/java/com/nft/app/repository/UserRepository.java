@@ -14,4 +14,7 @@ public interface UserRepository extends MongoRepository<User, String> {
   boolean existsByUserCode(String userCode);
 
   List<User> findByReferralCodeOrderByCreatedDateDesc(String referralCode);
+
+  boolean existsByUsername(String username);
+
 }

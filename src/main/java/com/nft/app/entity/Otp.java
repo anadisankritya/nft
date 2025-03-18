@@ -1,6 +1,5 @@
 package com.nft.app.entity;
 
-import com.nft.app.dto.UserRequest;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,19 +8,18 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.util.Base64;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "emailOtp")
-public class EmailOtp {
+@Document(collection = "Otp")
+public class Otp {
   @Id
   private String id;
-  private String email;
+  private String key;
   private String otp;
+  private String type;
 
   @CreatedDate
   private LocalDateTime createdDate;
@@ -30,8 +28,9 @@ public class EmailOtp {
   private LocalDateTime updatedDate;
 
 
-  public EmailOtp(String email, String otp) {
-    this.email = email;
+  public Otp(String key, String otp, String type) {
+    this.key = key;
     this.otp = otp;
+    this.type = type;
   }
 }

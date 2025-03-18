@@ -1,17 +1,10 @@
 package com.nft.app.service;
 
-import com.nft.app.entity.EmailOtp;
-import com.nft.app.exception.ErrorCode;
-import com.nft.app.exception.NftException;
-import com.nft.app.repository.EmailOtpRepository;
-import com.nft.app.util.OtpGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Slf4j
 @Service
