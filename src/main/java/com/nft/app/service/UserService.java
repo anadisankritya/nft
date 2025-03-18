@@ -2,7 +2,7 @@ package com.nft.app.service;
 
 import com.nft.app.dto.UserDetailsResponse;
 import com.nft.app.dto.UserRequest;
-import com.nft.app.entity.Otp;
+import com.nft.app.entity.OtpDetails;
 import com.nft.app.entity.User;
 import com.nft.app.exception.ErrorCode;
 import com.nft.app.exception.NftException;
@@ -48,13 +48,14 @@ public class UserService {
   }
 
   private void saveOtp(String key, String otp, String type) {
-    Otp emailOtp = new Otp(key, otp, type);
-    Optional<Otp> emailOtpOptional = otpRepository.findByTypeAndKey(type, key);
-    if (emailOtpOptional.isPresent()) {
-      emailOtp = emailOtpOptional.get();
-      emailOtp.setOtp(otp);
+    OtpDetails otpDetails = new OtpDetails(key, otp, type);
+
+    Optional<OtpDetails> otpOptional = otpRepository.findByTypeAndKey(type, key);
+    if (otpOptional.isPresent()) {
+      otpDetails = otpOptional.get();
+      otpDetails.setOtp(otp);
     }
-    otpRepository.save(emailOtp);
+    otpRepository.save(otpDetails);
   }
 
   @Retryable(retryFor = UserCodeException.class)
@@ -104,10 +105,10 @@ public class UserService {
 
   private void verifyOtp(String key, String otp, String type) {
     log.info("inside UserService::verifyOtp for key - {}", key);
-    Optional<Otp> emailOtpOptional = otpRepository.findByTypeAndKey(type, key);
+    Optional<OtpDetails> emailOtpOptional = otpRepository.findByTypeAndKey(type, key);
     if (emailOtpOptional.isPresent()) {
-      Otp emailOtp = emailOtpOptional.get();
-      if (emailOtp.getOtp().equals(otp)) {
+      OtpDetails emailOtpDetails = emailOtpOptional.get();
+      if (emailOtpDetails.getOtp().equals(otp)) {
         log.info("Otp verified for key - {}", key);
         return;
       }

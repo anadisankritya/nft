@@ -13,8 +13,8 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "Otp")
-public class Otp {
+@Document(collection = "otpDetails")
+public class OtpDetails {
   @Id
   private String id;
   private String key;
@@ -28,7 +28,7 @@ public class Otp {
   private LocalDateTime updatedDate;
 
 
-  public Otp(String key, String otp, String type) {
+  public OtpDetails(String key, String otp, String type) {
     this.key = key;
     this.otp = otp;
     this.type = type;
