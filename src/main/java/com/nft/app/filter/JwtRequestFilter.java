@@ -31,7 +31,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
   private static final List<String> BYPASS_URI_LIST = List.of(
       "/nft/register/api/v1/send-email-otp",
       "/nft/register/api/v1/send-phone-otp",
-      "/nft/register/api/v1/signup"
+      "/nft/register/api/v1/signup",
+      "/nft/user/api/v1/login"
   );
 
   @Override
@@ -53,14 +54,15 @@ public class JwtRequestFilter extends OncePerRequestFilter {
       throw new RuntimeException("Unable to extract token");
     }
 
-    if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+//    if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+    if (email != null) {
       if (jwtUtil.validateToken(token, email)) {
         UsernamePasswordAuthenticationToken authToken =
             new UsernamePasswordAuthenticationToken(email, null, new ArrayList<>());
         authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(authToken);
       } else {
-        logger.error("Token verification failed");
+        logger.info("Token verification failed");
         throw new RuntimeException("Invalid token");
       }
     }
