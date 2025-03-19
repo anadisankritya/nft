@@ -64,8 +64,7 @@ public class NftControllerAdvice {
       displayMessage = exceptionMessage;
     else
       displayMessage = errorCode.getDisplayMessage();
-    NftResponse<Object> dmsResponse = new NftResponse<>
-        (errorCode.getCode(), errorCode.name(), displayMessage, null);
+    NftResponse<Object> dmsResponse = new NftResponse<>(errorCode.getCode(), errorCode.name(), displayMessage, null);
     return new ResponseEntity<>(dmsResponse, errorCode.getHttpStatus());
   }
 
