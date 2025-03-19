@@ -3,6 +3,7 @@ package com.nft.app.controller;
 import com.nft.app.dto.NftResponse;
 import com.nft.app.dto.UserRequest;
 import com.nft.app.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,13 +32,9 @@ public class RegisterController {
   }
 
   @PostMapping("/signup")
-  public ResponseEntity<NftResponse<String>> signup(@RequestBody UserRequest userRequest) {
-    try {
-      userService.registerUser(userRequest);
-      return ResponseEntity.ok(new NftResponse<>("User registered"));
-    } catch (Exception e) {
-      return ResponseEntity.badRequest().body(new NftResponse<>(e.getMessage()));
-    }
+  public ResponseEntity<NftResponse<String>> signup(@RequestBody @Valid UserRequest userRequest) {
+    userService.registerUser(userRequest);
+    return ResponseEntity.ok(new NftResponse<>("User registered"));
   }
 
   @PostMapping("/reset-password")
