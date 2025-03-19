@@ -50,7 +50,10 @@ public class UserService {
     if (userRepository.findByEmail(email).isPresent()) {
       throw new NftException(ErrorCode.EMAIL_ALREADY_EXISTS);
     }
-
+    if (otpService.checkOtpAlreadySent(email, AppConstants.EMAIL)) {
+      log.info("Otp already sent");
+      return;
+    }
     otpService.sendOtp(email, AppConstants.EMAIL);
   }
 
@@ -59,6 +62,11 @@ public class UserService {
 
     if (userRepository.existsByPhoneNo(mobileNo)) {
       throw new NftException(ErrorCode.MOBILE_NO_ALREADY_EXISTS);
+    }
+
+    if (otpService.checkOtpAlreadySent(mobileNo, AppConstants.MOBILE)) {
+      log.info("Otp already sent");
+      return;
     }
 
     otpService.sendOtp(mobileNo, AppConstants.MOBILE);
@@ -143,6 +151,11 @@ public class UserService {
     log.info("inside UserService::sendPasswordResetOtp for email - {}", email);
 
     validateUserEmail(email);
+
+    if (otpService.checkOtpAlreadySent(email, AppConstants.EMAIL)) {
+      log.info("Otp already sent");
+      return;
+    }
     otpService.sendOtp(email, AppConstants.EMAIL);
   }
 

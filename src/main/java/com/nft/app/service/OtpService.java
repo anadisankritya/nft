@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Slf4j
@@ -55,5 +56,12 @@ public class OtpService {
       }
     }
     throw new NftException(ErrorCode.INVALID_OTP);
+  }
+
+  public boolean checkOtpAlreadySent(String key, String type) {
+    Optional<OtpDetails> otpDetails = otpRepository.findByTypeAndKey(type, key);
+    return otpDetails.map(
+        details -> details.getUpdatedDate().isAfter(LocalDateTime.now().minusMinutes(15L))
+    ).orElse(false);
   }
 }

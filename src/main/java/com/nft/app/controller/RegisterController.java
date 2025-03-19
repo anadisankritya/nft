@@ -5,6 +5,7 @@ import com.nft.app.dto.UserRequest;
 import com.nft.app.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,31 +23,32 @@ public class RegisterController {
   @PostMapping("/api/v1/send-email-otp")
   public ResponseEntity<NftResponse<String>> sendEmailOtp(@RequestParam String email) {
     userService.sendEmailOtp(email);
-    return ResponseEntity.ok(new NftResponse<>("OTP sent"));
+    return ResponseEntity.ok(new NftResponse<>("OTP sent", null));
   }
 
   @PostMapping("/api/v1/send-phone-otp")
   public ResponseEntity<NftResponse<String>> sendPhoneOtp(@RequestParam String mobileNo) {
     userService.sendMobileOtp(mobileNo);
-    return ResponseEntity.ok(new NftResponse<>("OTP sent"));
+    return ResponseEntity.ok(new NftResponse<>("OTP sent", null));
   }
 
   @PostMapping("/api/v1/signup")
   public ResponseEntity<NftResponse<String>> signup(@RequestBody @Valid UserRequest userRequest) {
     userService.registerUser(userRequest);
-    return ResponseEntity.ok(new NftResponse<>("User registered"));
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(new NftResponse<>("User registered", null));
   }
 
   @PostMapping("/api/v1/reset-password")
   public ResponseEntity<NftResponse<String>> resetPassword(@RequestParam String email) {
     userService.sendPasswordResetOtp(email);
-    return ResponseEntity.ok(new NftResponse<>("Password reset emailOtp sent"));
+    return ResponseEntity.ok(new NftResponse<>("Password reset otp sent", null));
   }
 
   @PostMapping("/api/v1/update-password")
   public ResponseEntity<NftResponse<String>> updatePassword(@RequestBody UserRequest userRequest) {
     userService.updatePassword(userRequest);
-    return ResponseEntity.ok(new NftResponse<>("Password updated"));
+    return ResponseEntity.ok(new NftResponse<>("Password updated", null));
 
   }
 
