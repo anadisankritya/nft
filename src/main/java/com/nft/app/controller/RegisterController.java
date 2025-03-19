@@ -39,22 +39,15 @@ public class RegisterController {
 
   @PostMapping("/reset-password")
   public ResponseEntity<NftResponse<String>> resetPassword(@RequestParam String email) {
-    try {
-      userService.sendPasswordResetOtp(email);
-      return ResponseEntity.ok(new NftResponse<>("Password reset emailOtp sent"));
-    } catch (Exception e) {
-      return ResponseEntity.badRequest().body(new NftResponse<>(e.getMessage()));
-    }
+    userService.sendPasswordResetOtp(email);
+    return ResponseEntity.ok(new NftResponse<>("Password reset emailOtp sent"));
   }
 
   @PostMapping("/update-password")
   public ResponseEntity<NftResponse<String>> updatePassword(@RequestBody UserRequest userRequest) {
-    try {
-      userService.updatePassword(userRequest);
-      return ResponseEntity.ok(new NftResponse<>("Password updated"));
-    } catch (Exception e) {
-      return ResponseEntity.badRequest().body(new NftResponse<>(e.getMessage()));
-    }
+    userService.updatePassword(userRequest);
+    return ResponseEntity.ok(new NftResponse<>("Password updated"));
+
   }
 
 }
