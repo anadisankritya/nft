@@ -12,6 +12,14 @@ public record NftResponse<T>(
 ) {
 
 
+  public NftResponse(ErrorCode errorCode) {
+    this(errorCode, null);
+  }
+
+  public NftResponse(ErrorCode errorCode, T data) {
+    this(errorCode.getCode(), errorCode.name(), errorCode.getDisplayMessage(), data);
+  }
+
   public NftResponse(String displayMessage, T data) {
     this("200", "SUCCESS", displayMessage, data);
   }

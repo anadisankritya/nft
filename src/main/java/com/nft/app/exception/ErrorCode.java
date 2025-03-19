@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 @Getter
 @AllArgsConstructor
@@ -23,7 +24,9 @@ public enum ErrorCode {
   MISSING_HEADER("110", HttpStatus.BAD_REQUEST, "Missing Header Error"),
   MISSING_PARAMETER("111", BAD_REQUEST, "Missing Parameter Error"),
   INVALID_REQUEST("112", BAD_REQUEST, "Invalid request body"),
-  URI_EXCEPTION("113", INTERNAL_SERVER_ERROR, "URI seems to be invalid");
+  URI_EXCEPTION("113", INTERNAL_SERVER_ERROR, "URI seems to be invalid"),
+  INVALID_TOKEN("114", UNAUTHORIZED, "Unauthorized request. Invalid token"),
+  OBJECT_MAPPING_FAILED("8413", INTERNAL_SERVER_ERROR, "Object mapping failed");
 
 
   private final String code;
