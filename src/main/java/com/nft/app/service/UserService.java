@@ -1,21 +1,23 @@
 package com.nft.app.service;
 
+import com.nft.app.constant.AppConstants;
 import com.nft.app.dto.UserDetailsResponse;
 import com.nft.app.dto.UserRequest;
-import com.nft.app.entity.OtpDetails;
+import com.nft.app.entity.AppConfig;
 import com.nft.app.entity.User;
 import com.nft.app.exception.ErrorCode;
 import com.nft.app.exception.NftException;
 import com.nft.app.exception.UserCodeException;
-import com.nft.app.repository.OtpRepository;
+import com.nft.app.repository.AppConfigRepository;
 import com.nft.app.repository.UserRepository;
 import com.nft.app.util.AlphabeticalCodeGenerator;
 import com.nft.app.util.JwtUtil;
-import com.nft.app.util.OtpGenerator;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -27,13 +29,20 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserService {
 
-  public static final String EMAIL = "EMAIL";
-  public static final String MOBILE = "MOBILE";
+  private AppConfig appConfig;
+
   private final UserRepository userRepository;
   private final JwtUtil jwtUtil;
-  private final EmailService emailService;
-  private final OtpRepository otpRepository;
-  private final SmsService smsService;
+  private final AppConfigRepository appConfigRepository;
+  private final OtpService otpService;
+
+  @PostConstruct
+  private void init() {
+    List<AppConfig> appConfigList = appConfigRepository.findAll();
+    if (!appConfigList.isEmpty()) {
+      appConfig = appConfigList.getFirst();
+    }
+  }
 
   public void sendEmailOtp(String email) {
     log.info("inside UserService::sendEmailOtp for email - {}", email);
@@ -42,21 +51,18 @@ public class UserService {
       throw new NftException(ErrorCode.EMAIL_ALREADY_EXISTS);
     }
 
-    String otp = OtpGenerator.generateSixDigitOtp();
-//    emailService.sendEmailOtp(email, otp);
-    saveOtp(email, otp, EMAIL);
-    log.info("email otp sent {}", otp);
+    otpService.sendOtp(email, AppConstants.EMAIL);
   }
 
-  private void saveOtp(String key, String otp, String type) {
-    OtpDetails otpDetails = new OtpDetails(key, otp, type);
+  public void sendMobileOtp(String mobileNo) {
+    log.info("inside UserService::sendMobileOtp for mobileNo - {}", mobileNo);
 
-    Optional<OtpDetails> otpOptional = otpRepository.findByTypeAndKey(type, key);
-    if (otpOptional.isPresent()) {
-      otpDetails = otpOptional.get();
-      otpDetails.setOtp(otp);
+    if (userRepository.existsByPhoneNo(mobileNo)) {
+      throw new NftException(ErrorCode.MOBILE_NO_ALREADY_EXISTS);
     }
-    otpRepository.save(otpDetails);
+
+    otpService.sendOtp(mobileNo, AppConstants.MOBILE);
+
   }
 
   @Retryable(retryFor = UserCodeException.class)
@@ -70,20 +76,39 @@ public class UserService {
     String email = user.getEmail();
     log.info("email - {} , generated userCode - {}", email, userCode);
 
-    verifyOtp(email, userRequest.emailOtp(), EMAIL);
-    verifyOtp(userRequest.phoneNo().toString(), userRequest.smsOtp(), MOBILE);
-    verifyUserDetails(email, user);
+    otpService.verifyOtp(email, userRequest.emailOtp(), AppConstants.EMAIL);
+    otpService.verifyOtp(userRequest.phoneNo(), userRequest.smsOtp(), AppConstants.MOBILE);
+    verifyUserDetails(user);
     userRepository.save(user);
   }
 
-  private void verifyUserDetails(String email, User user) {
-    if (userRepository.findByEmail(email).isPresent()) {
+  private void verifyUserDetails(User user) {
+    log.info("inside UserService::verifyUserDetails for email - {}", user.getEmail());
+
+    boolean existsByUserCode = userRepository.existsByUserCode(user.getUserCode());
+
+    //validate referral code
+    if (appConfig != null && appConfig.getReferralCodeMandatory()) {
+      if (!StringUtils.hasText(user.getReferralCode())) {
+        throw new NftException(ErrorCode.REFERRAL_CODE_MANDATORY);
+      }
+      if (!existsByUserCode) {
+        throw new NftException(ErrorCode.INVALID_REFERRAL_CODE);
+      }
+    }
+
+    //validate user email
+    if (userRepository.findByEmail(user.getEmail()).isPresent()) {
       throw new NftException(ErrorCode.EMAIL_ALREADY_EXISTS);
     }
+
+    //validate username
     if (userRepository.existsByUsername(user.getUsername())) {
       throw new NftException(ErrorCode.USERNAME_ALREADY_EXISTS);
     }
-    if (userRepository.existsByUserCode(user.getUserCode())) {
+
+    //validate user code
+    if (existsByUserCode) {
       throw new UserCodeException(ErrorCode.DUPLICATE_USER_CODE);
     }
   }
@@ -104,19 +129,6 @@ public class UserService {
     throw new RuntimeException("Invalid credentials");
   }
 
-  private void verifyOtp(String key, String otp, String type) {
-    log.info("inside UserService::verifyOtp for key - {}", key);
-    Optional<OtpDetails> emailOtpOptional = otpRepository.findByTypeAndKey(type, key);
-    if (emailOtpOptional.isPresent()) {
-      OtpDetails emailOtpDetails = emailOtpOptional.get();
-      if (emailOtpDetails.getOtp().equals(otp)) {
-        log.info("Otp verified for key - {}", key);
-        return;
-      }
-    }
-    throw new NftException(ErrorCode.INVALID_OTP);
-  }
-
   public List<?> getUserReferralList(String email) {
     Optional<User> userOptional = userRepository.findByEmail(email);
     if (userOptional.isPresent()) {
@@ -131,17 +143,14 @@ public class UserService {
     log.info("inside UserService::sendPasswordResetOtp for email - {}", email);
 
     validateUserEmail(email);
-
-    String otp = OtpGenerator.generateSixDigitOtp();
-    emailService.sendEmailOtp(email, otp);
-    saveOtp(email, otp, EMAIL);
+    otpService.sendOtp(email, AppConstants.EMAIL);
   }
 
   public void updatePassword(UserRequest userRequest) {
     String email = userRequest.email();
     log.info("inside UserService::updatePassword for email - {}", email);
 
-    verifyOtp(email, userRequest.emailOtp(), EMAIL);
+    otpService.verifyOtp(email, userRequest.emailOtp(), AppConstants.EMAIL);
 
     User user = validateUserEmail(email);
     user.setPassword(userRequest.password());
@@ -152,16 +161,6 @@ public class UserService {
   private User validateUserEmail(String email) {
     return userRepository.findByEmail(email)
         .orElseThrow(() -> new NftException(ErrorCode.USER_NOT_FOUND));
-  }
-
-  public void sendMobileOtp(Integer mobileNo) {
-    log.info("inside UserService::sendMobileOtp for mobileNo - {}", mobileNo);
-    String otp = OtpGenerator.generateSixDigitOtp();
-    saveOtp(mobileNo.toString(), otp, MOBILE);
-//    String smsResponse = smsService.sendSms(otp, mobileNo);
-    String smsResponse = "otp sent " + otp;
-
-    log.info("mobileNo - {}, sendSms response - {}", mobileNo, smsResponse);
   }
 
 }

@@ -26,7 +26,7 @@ public class SmsService {
 
   private final RestTemplate restTemplate;
 
-  private String sendSms(String message, String numbers) {
+  private void sendSms(String message, String numbers) {
     try {
       // Construct the request data
       String data = String.format("apikey=%s&message=%s&sender=%s&numbers=%s",
@@ -43,14 +43,14 @@ public class SmsService {
           smsApiUrl, HttpMethod.POST, entity, String.class);
 
       log.info("SMS sent successfully: {}", response.getBody());
-      return response.getBody();
     } catch (Exception e) {
       log.error("Error sending SMS: ", e);
       throw e;
     }
   }
 
-  public String sendSms(String message, Integer toNumber) {
-    return sendSms(message, toNumber.toString());
+  public void sendMobileOtp(String toNumber, String otp) {
+    String otpMessage = "Your NFT otp is " + otp;
+    sendSms(otpMessage, toNumber);
   }
 }

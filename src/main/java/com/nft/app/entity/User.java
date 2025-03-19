@@ -25,7 +25,7 @@ public class User {
   private String password;
   private String userCode;
   private String referralCode;
-  private Integer phoneNo;
+  private String phoneNo;
 
   @CreatedDate
   private LocalDateTime createdDate;

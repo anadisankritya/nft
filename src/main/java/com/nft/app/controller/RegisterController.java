@@ -25,7 +25,7 @@ public class RegisterController {
   }
 
   @PostMapping("/send-phone-otp")
-  public ResponseEntity<NftResponse<String>> sendPhoneOtp(@RequestParam Integer mobileNo) {
+  public ResponseEntity<NftResponse<String>> sendPhoneOtp(@RequestParam String mobileNo) {
     userService.sendMobileOtp(mobileNo);
     return ResponseEntity.ok(new NftResponse<>("OTP sent"));
   }
