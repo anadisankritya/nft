@@ -1,6 +1,5 @@
 package com.nft.app.service;
 
-import com.nft.app.constant.AppConstants;
 import com.nft.app.entity.OtpDetails;
 import com.nft.app.exception.ErrorCode;
 import com.nft.app.exception.NftException;
@@ -26,10 +25,10 @@ public class OtpService {
     log.info("inside OtpService::sendOtp for  - {}", to);
 
     String otp = OtpGenerator.generateSixDigitOtp();
-    switch (type) {
-      case AppConstants.EMAIL -> emailService.sendEmailOtp(to, otp);
-      case AppConstants.MOBILE -> smsService.sendMobileOtp(to, otp);
-    }
+//    switch (type) {
+//      case AppConstants.EMAIL -> emailService.sendEmailOtp(to, otp);
+//      case AppConstants.MOBILE -> smsService.sendMobileOtp(to, otp);
+//    }
     saveOtp(to, otp, type);
     log.info("Otp sent {} to {}", otp, to);
   }
@@ -58,7 +57,7 @@ public class OtpService {
     throw new NftException(ErrorCode.INVALID_OTP);
   }
 
-  public boolean checkOtpAlreadySent(String key, String type) {
+  public boolean checkOtpRecentlySent(String key, String type) {
     Optional<OtpDetails> otpDetails = otpRepository.findByTypeAndKey(type, key);
     return otpDetails.map(
         details -> details.getUpdatedDate().isAfter(LocalDateTime.now().minusMinutes(15L))

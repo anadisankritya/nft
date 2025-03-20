@@ -11,16 +11,16 @@ import com.nft.app.exception.UserCodeException;
 import com.nft.app.repository.AppConfigRepository;
 import com.nft.app.repository.UserRepository;
 import com.nft.app.util.AlphabeticalCodeGenerator;
+import com.nft.app.util.Base64Utils;
 import com.nft.app.util.JwtUtil;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
@@ -50,7 +50,7 @@ public class UserService {
     if (userRepository.findByEmail(email).isPresent()) {
       throw new NftException(ErrorCode.EMAIL_ALREADY_EXISTS);
     }
-    if (otpService.checkOtpAlreadySent(email, AppConstants.EMAIL)) {
+    if (otpService.checkOtpRecentlySent(email, AppConstants.EMAIL)) {
       log.info("Otp already sent");
       return;
     }
@@ -64,7 +64,7 @@ public class UserService {
       throw new NftException(ErrorCode.MOBILE_NO_ALREADY_EXISTS);
     }
 
-    if (otpService.checkOtpAlreadySent(mobileNo, AppConstants.MOBILE)) {
+    if (otpService.checkOtpRecentlySent(mobileNo, AppConstants.MOBILE)) {
       log.info("Otp already sent");
       return;
     }
@@ -84,8 +84,10 @@ public class UserService {
     String email = user.getEmail();
     log.info("email - {} , generated userCode - {}", email, userCode);
 
-    otpService.verifyOtp(email, userRequest.emailOtp(), AppConstants.EMAIL);
-    otpService.verifyOtp(userRequest.phoneNo(), userRequest.smsOtp(), AppConstants.MOBILE);
+    if (BooleanUtils.isTrue(appConfig.getOtpRequired())) {
+      otpService.verifyOtp(email, userRequest.emailOtp(), AppConstants.EMAIL);
+      otpService.verifyOtp(userRequest.phoneNo(), userRequest.smsOtp(), AppConstants.MOBILE);
+    }
     verifyUserDetails(user);
     userRepository.save(user);
   }
@@ -128,7 +130,7 @@ public class UserService {
     if (userOpt.isPresent()) {
 
       String base64EncodedPassword = userOpt.get().getPassword();
-      String savedPassword = new String(Base64.getDecoder().decode(base64EncodedPassword), StandardCharsets.UTF_8);
+      String savedPassword = Base64Utils.decodeToString(base64EncodedPassword);
 
       if (savedPassword.equals(password)) {
         return jwtUtil.generateToken(userOpt.get().getEmail());
@@ -150,9 +152,9 @@ public class UserService {
   public void sendPasswordResetOtp(String email) {
     log.info("inside UserService::sendPasswordResetOtp for email - {}", email);
 
-    validateUserEmail(email);
+    getUser(email);
 
-    if (otpService.checkOtpAlreadySent(email, AppConstants.EMAIL)) {
+    if (otpService.checkOtpRecentlySent(email, AppConstants.EMAIL)) {
       log.info("Otp already sent");
       return;
     }
@@ -165,13 +167,12 @@ public class UserService {
 
     otpService.verifyOtp(email, userRequest.emailOtp(), AppConstants.EMAIL);
 
-    User user = validateUserEmail(email);
-    user.setPassword(userRequest.password());
+    User user = getUser(email);
+    user.setPassword(Base64Utils.encodeString(userRequest.password()));
     userRepository.save(user);
-
   }
 
-  private User validateUserEmail(String email) {
+  private User getUser(String email) {
     return userRepository.findByEmail(email)
         .orElseThrow(() -> new NftException(ErrorCode.USER_NOT_FOUND));
   }

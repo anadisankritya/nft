@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Document(collection = "otpDetails")
 public class OtpDetails {
+
   @Id
   private String id;
   private String key;
