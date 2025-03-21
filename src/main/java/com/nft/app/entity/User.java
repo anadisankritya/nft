@@ -1,6 +1,6 @@
 package com.nft.app.entity;
 
-import com.nft.app.dto.UserRequest;
+import com.nft.app.dto.request.UserRequest;
 import com.nft.app.util.Base64Utils;
 import lombok.AllArgsConstructor;
 import lombok.Data;

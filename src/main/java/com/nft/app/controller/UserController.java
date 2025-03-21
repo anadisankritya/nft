@@ -1,7 +1,8 @@
 package com.nft.app.controller;
 
-import com.nft.app.dto.LoginRequest;
 import com.nft.app.dto.NftResponse;
+import com.nft.app.dto.request.LoginRequest;
+import com.nft.app.dto.response.UserTeamResponse;
 import com.nft.app.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -31,11 +31,11 @@ public class UserController {
     return ResponseEntity.ok(new NftResponse<>("Login success", responseMap));
   }
 
-  @GetMapping("/api/v1/refer-list")
-  public ResponseEntity<NftResponse<?>> referList() {
+  @GetMapping("/api/v1/my-team")
+  public ResponseEntity<NftResponse<UserTeamResponse>> referList() {
     String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
-    List<?> userReferralList = userService.getUserReferralList(email);
-    return ResponseEntity.ok(new NftResponse<>("My team list fetched", userReferralList));
+    UserTeamResponse userTeamList = userService.getUserTeamList(email);
+    return ResponseEntity.ok(new NftResponse<>("My team list fetched", userTeamList));
   }
 
 }

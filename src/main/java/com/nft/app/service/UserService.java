@@ -1,8 +1,8 @@
 package com.nft.app.service;
 
 import com.nft.app.constant.AppConstants;
-import com.nft.app.dto.UserDetailsResponse;
-import com.nft.app.dto.UserRequest;
+import com.nft.app.dto.request.UserRequest;
+import com.nft.app.dto.response.UserTeamResponse;
 import com.nft.app.entity.AppConfig;
 import com.nft.app.entity.User;
 import com.nft.app.exception.ErrorCode;
@@ -139,11 +139,12 @@ public class UserService {
     throw new RuntimeException("Invalid credentials");
   }
 
-  public List<?> getUserReferralList(String email) {
+  public UserTeamResponse getUserTeamList(String email) {
     Optional<User> userOptional = userRepository.findByEmail(email);
     if (userOptional.isPresent()) {
       String userCode = userOptional.get().getUserCode();
-      return userRepository.findByReferralCodeOrderByCreatedDateDesc(userCode).stream().map(UserDetailsResponse::new).toList();
+      List<String> teamMembers = userRepository.findByReferralCodeOrderByCreatedDateDesc(userCode).stream().map(User::getUsername).toList();
+      return new UserTeamResponse(teamMembers);
     }
     throw new NftException(ErrorCode.USER_NOT_FOUND);
   }

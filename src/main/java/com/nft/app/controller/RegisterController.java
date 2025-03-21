@@ -1,7 +1,7 @@
 package com.nft.app.controller;
 
 import com.nft.app.dto.NftResponse;
-import com.nft.app.dto.UserRequest;
+import com.nft.app.dto.request.UserRequest;
 import com.nft.app.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package com.nft.app.dto;
+package com.nft.app.dto.response;
 
 import com.nft.app.entity.User;
 import lombok.Data;
