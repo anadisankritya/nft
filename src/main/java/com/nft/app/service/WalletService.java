@@ -14,6 +14,7 @@ import com.nft.app.repository.WalletMasterRepository;
 import com.nft.app.repository.WithdrawRequestRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -69,7 +70,8 @@ public class WalletService {
       throw new NftException(ErrorCode.MINIMUM_WITHDRAW_ERROR);
     }
 
-    if (user.getCreatedDate().isAfter(LocalDateTime.now().minusDays(7L))) {
+    if (user.getCreatedDate().isAfter(LocalDateTime.now()
+        .minusDays(UserService.appConfig.getMinWithdrawDays()))) {
       throw new NftException(ErrorCode.NEW_USER_WITHDRAW);
     }
 
@@ -83,18 +85,58 @@ public class WalletService {
     }
   }
 
-  public List<?> getPendingRequests() {
-    return withdrawRequestRepository.findByStatus("PENDING");
+  public List<?> getWithdrawalRequests(String status, Pageable pageable) {
+    return withdrawRequestRepository.findByStatus(status, pageable);
   }
 
-  public void updateRequestStatus(String id, String status, String comment) {
-    Optional<WithdrawRequest> optionalRequest = withdrawRequestRepository.findById(id);
-    if (optionalRequest.isPresent()) {
-      WithdrawRequest request = optionalRequest.get();
-      request.setStatus(status);
-      request.setComment(comment);
-      withdrawRequestRepository.save(request);
+  public void updateWithdrawalRequest(String id, String status, String comment) {
+    Optional<WithdrawRequest> withdrawRequestOptional = withdrawRequestRepository.findById(id);
+    if (withdrawRequestOptional.isPresent()) {
+      final WithdrawRequest withdrawRequest = withdrawRequestOptional.get();
+      switch (status) {
+        case "SUCCESS" -> updateWithdrawRequest(status, comment, withdrawRequest);
+        case "FAILED" -> {
+          UserWallet userWallet = userWalletRepository.findByEmail(withdrawRequest.getEmail());
+          userWallet.setBalance(userWallet.getBalance() + withdrawRequest.getTotalAmount());
+          userWalletRepository.save(userWallet);
+          updateWithdrawRequest(status, comment, withdrawRequest);
+        }
+        default -> throw new RuntimeException("invalid action");
+      }
     }
+  }
+
+  private void updateWithdrawRequest(String status, String comment, WithdrawRequest withdrawRequest) {
+    withdrawRequest.setStatus(status);
+    withdrawRequest.setComment(comment);
+    withdrawRequestRepository.save(withdrawRequest);
+  }
+
+  public List<?> getDepositRequests(String status, Pageable pageable) {
+    return depositRequestRepository.findByStatus(status, pageable);
+  }
+
+  public void updateDepositRequest(String id, String status, String comment) {
+    Optional<DepositRequest> depositRequestOptional = depositRequestRepository.findById(id);
+    if (depositRequestOptional.isPresent()) {
+      final DepositRequest depositRequest = depositRequestOptional.get();
+      switch (status) {
+        case "SUCCESS" -> {
+          updateDepositRequest(status, comment, depositRequest);
+//          UserWallet userWallet = userWalletRepository.findByEmail(depositRequest.getEmail());
+//          userWallet.setBalance(userWallet.getBalance() + depositRequest.getAmount());
+//          userWalletRepository.save(userWallet);
+        }
+        case "FAILED" -> updateDepositRequest(status, comment, depositRequest);
+        default -> throw new RuntimeException("invalid action");
+      }
+    }
+  }
+
+  private void updateDepositRequest(String status, String comment, DepositRequest depositRequest) {
+    depositRequest.setStatus(status);
+    depositRequest.setComment(comment);
+    depositRequestRepository.save(depositRequest);
   }
 
 }

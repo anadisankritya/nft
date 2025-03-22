@@ -34,7 +34,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserService {
 
-  private AppConfig appConfig;
+  public static AppConfig appConfig;
 
   private final UserRepository userRepository;
   private final JwtUtil jwtUtil;
