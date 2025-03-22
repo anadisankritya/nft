@@ -1,4 +1,4 @@
-package com.nft.app.controller.UI;
+package com.nft.app.controller.ui;
 
 import com.nft.app.service.InvestmentTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,14 +9,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 
 @Controller
-@RequestMapping("/ui/user-level")
-public class AdminUserLevelController {
+@RequestMapping("/ui/investment-types")
+public class AdminInvestmentTypeController {
 
     @Autowired
     private InvestmentTypeService investmentTypeService;
 
     @GetMapping("/list")
     public String getAllInvestmentTypes(Model model) {
-        return "UserLevelCRUD";
+        return "InvestmentTypeCRUD";
     }
 }

@@ -2,6 +2,7 @@ package com.nft.app.service;
 
 import com.nft.app.constant.AppConstants;
 import com.nft.app.dto.request.UserRequest;
+import com.nft.app.dto.response.UserDetails;
 import com.nft.app.dto.response.UserTeamResponse;
 import com.nft.app.entity.AppConfig;
 import com.nft.app.entity.User;
@@ -27,7 +28,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -155,13 +155,21 @@ public class UserService {
   public UserTeamResponse getUserTeamList(String email) {
     log.info("inside UserService::getUserTeamList for email - {}", email);
 
-    Optional<User> userOptional = userRepository.findByEmail(email);
-    if (userOptional.isPresent()) {
-      String userCode = userOptional.get().getUserCode();
-      List<String> teamMembers = userRepository.findByReferralCodeOrderByCreatedDateDesc(userCode).stream().map(User::getUsername).toList();
-      return new UserTeamResponse(teamMembers);
-    }
-    throw new NftException(ErrorCode.USER_NOT_FOUND);
+    User user = getUser(email);
+    String userCode = user.getUserCode();
+    List<String> teamMembers = userRepository.findByReferralCodeOrderByCreatedDateDesc(userCode).stream().map(User::getUsername).toList();
+    return new UserTeamResponse(teamMembers);
+
+  }
+
+  public UserDetails getUserDetails(String email) {
+    log.info("inside UserService::getUserDetails for email - {}", email);
+    User user = getUser(email);
+
+    UserWallet userWallet = userWalletRepository.findByEmail(user.getEmail());
+    UserDetails userDetails = new UserDetails(user);
+    userDetails.setWalletBalance(userWallet.getBalance());
+    return userDetails;
   }
 
 
