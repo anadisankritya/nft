@@ -4,7 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
-import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.CONFLICT;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 @Getter
 @AllArgsConstructor
@@ -20,7 +24,7 @@ public enum ErrorCode {
   MOBILE_NO_ALREADY_EXISTS("109", HttpStatus.CONFLICT, "Mobile number already in use"),
   MISSING_HEADER("110", HttpStatus.BAD_REQUEST, "Missing Header Error"),
   MISSING_PARAMETER("111", BAD_REQUEST, "Missing Parameter Error"),
-  INVALID_REQUEST("112", BAD_REQUEST, "Invalid request body"),
+  INVALID_REQUEST("112", BAD_REQUEST, "Invalid request"),
   URI_EXCEPTION("113", INTERNAL_SERVER_ERROR, "URI seems to be invalid"),
   INVALID_TOKEN("114", UNAUTHORIZED, "Unauthorized request. Invalid token"),
   OBJECT_MAPPING_FAILED("115", INTERNAL_SERVER_ERROR, "Object mapping failed"),
@@ -37,8 +41,8 @@ public enum ErrorCode {
   INVALID_PASSWORD("126", UNAUTHORIZED, "Invalid password"),
   DUPLICATE_USER_LEVEL("127", BAD_REQUEST, "Duplicate User level."),
   CREATE_USER_LEVEL_FAILED("128", BAD_REQUEST, "Create User level failed."),
-  USER_LEVEL_NOT_FOUND("129",NOT_FOUND, "User level Not found"),
-  DUPLICATE_USER_LEVEL_IMAGE("130",CONFLICT,"Duplicate image upload for user level");
+  USER_LEVEL_NOT_FOUND("129", NOT_FOUND, "User level Not found"),
+  DUPLICATE_USER_LEVEL_IMAGE("130", CONFLICT, "Duplicate image upload for user level");
 
   private final String code;
   private final HttpStatus httpStatus;

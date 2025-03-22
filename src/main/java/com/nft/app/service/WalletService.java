@@ -105,7 +105,7 @@ public class WalletService {
 //          userWalletRepository.save(userWallet);
           updateWithdrawRequest(status, comment, withdrawRequest);
         }
-        default -> throw new RuntimeException("invalid action");
+        default -> throw new NftException(ErrorCode.INVALID_REQUEST);
       }
     }
   }
@@ -135,7 +135,7 @@ public class WalletService {
 //          userWalletRepository.save(userWallet);
         }
         case "FAILED" -> updateDepositRequest(status, comment, depositRequest);
-        default -> throw new RuntimeException("invalid action");
+        default -> throw new NftException(ErrorCode.INVALID_REQUEST);
       }
     }
   }
