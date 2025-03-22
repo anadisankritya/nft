@@ -106,10 +106,11 @@
         preventDuplicates: true
     };
 
-    let currentPage = 0; // 0-based index for backend
+    let currentPage = 0;  // 0-based index as expected by the backend
     let pageSize = 10;
     let totalPages = 1;
     let totalItems = 0;
+    let allItems = [];    // holds the current page's items from the API
 
     $(document).ready(function() {
         loadData();
@@ -124,10 +125,13 @@
                 page: currentPage,
                 size: pageSize
             },
-            success: function(data) {
-                totalItems = data.totalElements;
-                totalPages = data.totalPages;
-                populateData(data.content || data.data || data);
+            success: function(response) {
+                const pageData = response.data;
+                // Extract the paginated content and pagination details
+                allItems = pageData.content;
+                totalItems = pageData.totalElements;
+                totalPages = pageData.totalPages;
+                populateData(allItems);
 
                 if(totalPages > 1) {
                     $('#paginationContainer').show();
@@ -146,8 +150,7 @@
         const pagination = $('#pagination').empty();
         const maxVisiblePages = 5;
         const currentPage1Based = currentPage + 1;
-
-        let startPage = Math.max(1, currentPage1Based - Math.floor(maxVisiblePages/2));
+        let startPage = Math.max(1, currentPage1Based - Math.floor(maxVisiblePages / 2));
         let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
 
         if (endPage - startPage < maxVisiblePages - 1) {
@@ -157,7 +160,7 @@
         // Previous Button
         pagination.append(`
             <li class="page-item ${currentPage === 0 ? 'disabled' : ''}">
-                <a class="page-link" href="#" onclick="changePage(${currentPage - 1})">&laquo;</a>
+                <a class="page-link" href="#" onclick="changePage(${currentPage - 1}); return false;">&laquo;</a>
             </li>
         `);
 
@@ -166,7 +169,7 @@
             const pageIndex0Based = i - 1;
             pagination.append(`
                 <li class="page-item ${pageIndex0Based === currentPage ? 'active' : ''}">
-                    <a class="page-link" href="#" onclick="changePage(${pageIndex0Based})">${i}</a>
+                    <a class="page-link" href="#" onclick="changePage(${pageIndex0Based}); return false;">${i}</a>
                 </li>
             `);
         }
@@ -174,7 +177,7 @@
         // Next Button
         pagination.append(`
             <li class="page-item ${currentPage >= totalPages - 1 ? 'disabled' : ''}">
-                <a class="page-link" href="#" onclick="changePage(${currentPage + 1})">&raquo;</a>
+                <a class="page-link" href="#" onclick="changePage(${currentPage + 1}); return false;">&raquo;</a>
             </li>
         `);
     }
@@ -226,7 +229,7 @@
                         <input type="text" id="comment-${item.id}"
                                placeholder="Add comment"
                                class="form-control form-control-sm"
-                               value="${item.comment || ''}"/>
+                               value="${item.comment ? item.comment : ''}"/>
                     </td>
                     <td class="action-col">
                         <button class="btn btn-sm btn-outline-success me-1"
@@ -261,7 +264,7 @@
                                 <input type="text" id="comment-${item.id}"
                                        placeholder="Add comment"
                                        class="form-control form-control-sm"
-                                       value="${item.comment || ''}"/>
+                                       value="${item.comment ? item.comment : ''}"/>
                             </div>
                         </div>
                         <div class="d-flex flex-column gap-1 ms-2">

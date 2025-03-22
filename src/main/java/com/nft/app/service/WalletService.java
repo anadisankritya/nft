@@ -14,6 +14,7 @@ import com.nft.app.repository.WalletMasterRepository;
 import com.nft.app.repository.WithdrawRequestRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -85,7 +86,7 @@ public class WalletService {
     }
   }
 
-  public List<?> getWithdrawalRequests(List<String> statusList, Pageable pageable) {
+  public Page<?> getWithdrawalRequests(List<String> statusList, Pageable pageable) {
     if (statusList.contains("PENDING")) {
       return withdrawRequestRepository.findByStatusIn(statusList, pageable);
     }
@@ -116,7 +117,7 @@ public class WalletService {
     withdrawRequestRepository.save(withdrawRequest);
   }
 
-  public List<?> getDepositRequests(List<String> statusList, Pageable pageable) {
+  public Page<?> getDepositRequests(List<String> statusList, Pageable pageable) {
     if (statusList.contains("PENDING")) {
       return depositRequestRepository.findByStatusIn(statusList, pageable);
     }

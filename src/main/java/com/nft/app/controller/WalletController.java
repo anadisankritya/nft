@@ -4,6 +4,7 @@ import com.nft.app.dto.NftResponse;
 import com.nft.app.dto.request.FundDepositRequest;
 import com.nft.app.service.WalletService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -42,7 +43,7 @@ public class WalletController {
   }
 
   @GetMapping("/api/v1/withdrawal-request")
-  public ResponseEntity<NftResponse<List<?>>> withdrawalRequests(@RequestParam(required = false) Integer page,
+  public ResponseEntity<NftResponse<Page<?>>> withdrawalRequests(@RequestParam(required = false) Integer page,
                                                                  @RequestParam(required = false) Integer size,
                                                                  @RequestParam List<String> status) {
     Pageable pageable = PageRequest.of(page, size);
@@ -63,7 +64,7 @@ public class WalletController {
   }
 
   @GetMapping("/api/v1/deposit-request")
-  public ResponseEntity<NftResponse<List<?>>> depositRequests(@RequestParam(required = false) Integer page,
+  public ResponseEntity<NftResponse<Page<?>>> depositRequests(@RequestParam(required = false) Integer page,
                                                               @RequestParam(required = false) Integer size,
                                                               @RequestParam List<String> status) {
     Pageable pageable = PageRequest.of(page, size);

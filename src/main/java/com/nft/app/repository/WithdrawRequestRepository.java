@@ -1,6 +1,7 @@
 package com.nft.app.repository;
 
 import com.nft.app.entity.WithdrawRequest;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
@@ -12,9 +13,9 @@ public interface WithdrawRequestRepository extends MongoRepository<WithdrawReque
 
   List<WithdrawRequest> findByEmailAndStatus(String email, String status);
 
-  List<WithdrawRequest> findByStatusIn(List<String> statusList, Pageable pageable);
+  Page<WithdrawRequest> findByStatusIn(List<String> statusList, Pageable pageable);
 
-  List<WithdrawRequest> findByStatusInOrderByUpdatedDateDesc(List<String> statusList, Pageable pageable);
+  Page<WithdrawRequest> findByStatusInOrderByUpdatedDateDesc(List<String> statusList, Pageable pageable);
 
 
 }
