@@ -2,6 +2,7 @@ package com.nft.app.controller;
 
 import com.nft.app.dto.NftResponse;
 import com.nft.app.dto.request.LoginRequest;
+import com.nft.app.dto.response.UserDetails;
 import com.nft.app.dto.response.UserTeamResponse;
 import com.nft.app.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,13 @@ public class UserController {
     Map<String, String> responseMap = new HashMap<>();
     responseMap.put("accessToken", token);
     return ResponseEntity.ok(new NftResponse<>("Login success", responseMap));
+  }
+
+  @GetMapping("/api/v1/my-profile")
+  public ResponseEntity<NftResponse<UserDetails>> userDetails() {
+    String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
+    UserDetails userDetails = userService.getUserDetails(email);
+    return ResponseEntity.ok(new NftResponse<>("My team list fetched", userDetails));
   }
 
   @GetMapping("/api/v1/my-team")

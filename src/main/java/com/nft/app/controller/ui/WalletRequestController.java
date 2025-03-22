@@ -1,4 +1,4 @@
-package com.nft.app.controller.UI;
+package com.nft.app.controller.ui;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -1,21 +1,22 @@
-package com.nft.app.controller.UI;
+package com.nft.app.controller.ui;
 
 import com.nft.app.service.InvestmentTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 
 @Controller
-@RequestMapping("/ui/investment-types")
-public class AdminInvestmentTypeController {
+@RequestMapping("/ui/user-level")
+public class AdminUserLevelController {
 
     @Autowired
     private InvestmentTypeService investmentTypeService;
 
     @GetMapping("/list")
     public String getAllInvestmentTypes(Model model) {
-        return "InvestmentTypeCRUD";
+        return "UserLevelCRUD";
     }
 }

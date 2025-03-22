@@ -1,4 +1,4 @@
-package com.nft.app.controller.UI;
+package com.nft.app.controller.ui;
 
 import com.nft.app.service.InvestmentTypeService;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -2,9 +2,11 @@ package com.nft.app.config;
 
 import com.nft.app.entity.AppConfig;
 import com.nft.app.entity.DepositRequest;
+import com.nft.app.entity.WalletMaster;
 import com.nft.app.entity.WithdrawRequest;
 import com.nft.app.repository.AppConfigRepository;
 import com.nft.app.repository.DepositRequestRepository;
+import com.nft.app.repository.WalletMasterRepository;
 import com.nft.app.repository.WithdrawRequestRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,7 @@ public class AppConfiguration {
   private final AppConfigRepository appConfigRepository;
   private final WithdrawRequestRepository withdrawRequestRepository;
   private final DepositRequestRepository depositRequestRepository;
+  private final WalletMasterRepository walletMasterRepository;
 
   @PostConstruct
   public void init() {
@@ -33,13 +36,28 @@ public class AppConfiguration {
 
     WithdrawRequest withdrawRequest = new WithdrawRequest("abc" + RandomUtils.secure().randomInt() + "@xyz.com", 100);
     withdrawRequestRepository.save(withdrawRequest);
+
+    DepositRequest depositRequest = getDepositRequest();
+    depositRequestRepository.save(depositRequest);
+
+    WalletMaster walletMaster = new WalletMaster();
+    walletMaster.setWalletName("wallet1");
+    walletMaster.setBep20Address("bep20address");
+    walletMaster.setTrc20Address("trc20address");
+    walletMasterRepository.deleteAll();
+    walletMasterRepository.save(walletMaster);
+
+
+  }
+
+  private static DepositRequest getDepositRequest() {
     DepositRequest depositRequest = new DepositRequest();
     depositRequest.setEmail("abc" + RandomUtils.secure().randomInt() + "@xyz.com");
     depositRequest.setStatus("PENDING");
     depositRequest.setAmount(500);
     depositRequest.setTransactionId(String.valueOf(RandomUtils.secure().randomInt()));
     depositRequest.setWalletName("dummyWallet");
-    depositRequestRepository.save(depositRequest);
+    return depositRequest;
   }
 
 
