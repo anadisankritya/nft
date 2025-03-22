@@ -42,7 +42,8 @@ public enum ErrorCode {
   DUPLICATE_USER_LEVEL("127", BAD_REQUEST, "Duplicate User level."),
   CREATE_USER_LEVEL_FAILED("128", BAD_REQUEST, "Create User level failed."),
   USER_LEVEL_NOT_FOUND("129", NOT_FOUND, "User level Not found"),
-  DUPLICATE_USER_LEVEL_IMAGE("130", CONFLICT, "Duplicate image upload for user level");
+  DUPLICATE_USER_LEVEL_IMAGE("130", CONFLICT, "Duplicate image upload for user level"),
+  TRANSACTION_ID_ALREADY_PRESENT("131", CONFLICT, "This transaction Id has already been used");
 
   private final String code;
   private final HttpStatus httpStatus;

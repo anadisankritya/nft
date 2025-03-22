@@ -43,6 +43,10 @@ public class WalletService {
     if (walletMasterOptional.isEmpty()) {
       throw new NftException(ErrorCode.WALLET_NOT_FOUND);
     }
+    boolean transactionIdUsed = depositRequestRepository.existsByStatusAndTransactionId("SUCCESS", fundDepositRequest.transactionId());
+    if (transactionIdUsed) {
+      throw new NftException(ErrorCode.TRANSACTION_ID_ALREADY_PRESENT);
+    }
     String walletName = walletMasterOptional.get().getWalletName();
     DepositRequest depositRequest = new DepositRequest(user.getEmail(), walletName, fundDepositRequest);
     depositRequestRepository.save(depositRequest);
