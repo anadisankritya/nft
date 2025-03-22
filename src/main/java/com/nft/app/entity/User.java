@@ -26,6 +26,8 @@ public class User {
   private String userCode;
   private String referralCode;
   private String phoneNo;
+  private Integer level;
+  private String walletId;
 
   @CreatedDate
   private LocalDateTime createdDate;
@@ -39,5 +41,6 @@ public class User {
     this.password = Base64Utils.encodeString(userRequest.password());
     this.referralCode = userRequest.referralCode();
     this.phoneNo = userRequest.phoneNo();
+    this.level = 0;
   }
 }

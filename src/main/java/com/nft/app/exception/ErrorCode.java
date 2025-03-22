@@ -26,7 +26,12 @@ public enum ErrorCode {
   INVALID_REQUEST("112", BAD_REQUEST, "Invalid request body"),
   URI_EXCEPTION("113", INTERNAL_SERVER_ERROR, "URI seems to be invalid"),
   INVALID_TOKEN("114", UNAUTHORIZED, "Unauthorized request. Invalid token"),
-  OBJECT_MAPPING_FAILED("8413", INTERNAL_SERVER_ERROR, "Object mapping failed");
+  OBJECT_MAPPING_FAILED("115", INTERNAL_SERVER_ERROR, "Object mapping failed"),
+  WALLET_NOT_FOUND("116", INTERNAL_SERVER_ERROR, "Wallet linked to user not found"),
+  MINIMUM_WITHDRAW_ERROR("117", BAD_REQUEST, "Minimum withdraw amount should be 50"),
+  NEW_USER_WITHDRAW("118", BAD_REQUEST, "Cannot withdraw until 7 days of registration"),
+  PENDING_WITHDRAW_REQUEST("119", INTERNAL_SERVER_ERROR, "Previous withdraw request is already pending"),
+  INSUFFICIENT_FUNDS("120", INTERNAL_SERVER_ERROR, "Insufficient wallet amount");
 
 
   private final String code;

@@ -5,11 +5,15 @@ import com.nft.app.dto.request.UserRequest;
 import com.nft.app.dto.response.UserTeamResponse;
 import com.nft.app.entity.AppConfig;
 import com.nft.app.entity.User;
+import com.nft.app.entity.UserWallet;
+import com.nft.app.entity.WalletMaster;
 import com.nft.app.exception.ErrorCode;
 import com.nft.app.exception.NftException;
 import com.nft.app.exception.UserCodeException;
 import com.nft.app.repository.AppConfigRepository;
 import com.nft.app.repository.UserRepository;
+import com.nft.app.repository.UserWalletRepository;
+import com.nft.app.repository.WalletMasterRepository;
 import com.nft.app.util.AlphabeticalCodeGenerator;
 import com.nft.app.util.Base64Utils;
 import com.nft.app.util.JwtUtil;
@@ -17,6 +21,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.RandomUtils;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -35,6 +40,8 @@ public class UserService {
   private final JwtUtil jwtUtil;
   private final AppConfigRepository appConfigRepository;
   private final OtpService otpService;
+  private final WalletMasterRepository walletMasterRepository;
+  private final UserWalletRepository userWalletRepository;
 
   @PostConstruct
   private void init() {
@@ -80,6 +87,7 @@ public class UserService {
     User user = new User(userRequest);
     String userCode = AlphabeticalCodeGenerator.generateEightLetterCode();
     user.setUserCode(userCode);
+    user.setWalletId(getRandomWallet());
 
     String email = user.getEmail();
     log.info("email - {} , generated userCode - {}", email, userCode);
@@ -89,7 +97,15 @@ public class UserService {
       otpService.verifyOtp(userRequest.phoneNo(), userRequest.smsOtp(), AppConstants.MOBILE);
     }
     verifyUserDetails(user);
+    createNewUserWallet(email);
     userRepository.save(user);
+  }
+
+  private void createNewUserWallet(String email) {
+    UserWallet userWallet = new UserWallet();
+    userWallet.setEmail(email);
+    userWallet.setBalance(0);
+    userWalletRepository.save(userWallet);
   }
 
   private void verifyUserDetails(User user) {
@@ -173,9 +189,15 @@ public class UserService {
     userRepository.save(user);
   }
 
-  private User getUser(String email) {
+  User getUser(String email) {
     return userRepository.findByEmail(email)
         .orElseThrow(() -> new NftException(ErrorCode.USER_NOT_FOUND));
+  }
+
+  private String getRandomWallet() {
+    List<WalletMaster> walletMasterList = walletMasterRepository.findAll();
+    int randomWalletNo = RandomUtils.secure().randomInt(0, walletMasterList.size());
+    return walletMasterList.get(randomWalletNo).getId();
   }
 
 }

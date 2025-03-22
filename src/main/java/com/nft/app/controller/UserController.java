@@ -25,7 +25,7 @@ public class UserController {
 
   @PostMapping("/api/v1/login")
   public ResponseEntity<NftResponse<?>> login(@RequestBody LoginRequest loginRequest) {
-    String token = userService.loginUser(loginRequest.getEmail(), loginRequest.getPassword());
+    String token = userService.loginUser(loginRequest.email(), loginRequest.password());
     Map<String, String> responseMap = new HashMap<>();
     responseMap.put("accessToken", token);
     return ResponseEntity.ok(new NftResponse<>("Login success", responseMap));
