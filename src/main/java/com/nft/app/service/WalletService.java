@@ -69,7 +69,8 @@ public class WalletService {
       throw new NftException(ErrorCode.MINIMUM_WITHDRAW_ERROR);
     }
 
-    if (user.getCreatedDate().isAfter(LocalDateTime.now().minusDays(7L))) {
+    if (user.getCreatedDate().isAfter(LocalDateTime.now()
+        .minusDays(UserService.appConfig.getMinWithdrawDays()))) {
       throw new NftException(ErrorCode.NEW_USER_WITHDRAW);
     }
 

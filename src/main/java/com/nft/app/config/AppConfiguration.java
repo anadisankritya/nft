@@ -20,6 +20,7 @@ public class AppConfiguration {
     AppConfig appConfig = new AppConfig();
     appConfig.setOtpRequired(false);
     appConfig.setReferralCodeMandatory(false);
+    appConfig.setMinWithdrawDays(7);
     appConfigRepository.deleteAll();
     appConfigRepository.save(appConfig);
   }

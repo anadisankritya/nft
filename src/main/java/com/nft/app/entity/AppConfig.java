@@ -16,5 +16,6 @@ public class AppConfig {
   private String id;
   private Boolean referralCodeMandatory;
   private Boolean otpRequired;
+  private Integer minWithdrawDays;
 
 }
