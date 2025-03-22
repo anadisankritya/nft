@@ -7,6 +7,7 @@ import com.nft.app.entity.InvestmentType;
 import com.nft.app.exception.ErrorCode;
 import com.nft.app.exception.InvestmentTypException;
 import com.nft.app.repository.InvestmentTypeRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,10 +17,12 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class InvestmentTypeService {
 
-    @Autowired
-    private InvestmentTypeRepository investmentTypeRepository;
+    private final InvestmentTypeRepository investmentTypeRepository;
+    private final UserLevelService userLevelService;
+
 
     public List<CreateInvestmentResponse> getAllInvestmentTypes(Integer page, Integer size) {
         if (Objects.nonNull(page) && Objects.nonNull(size)) {
@@ -30,8 +33,14 @@ public class InvestmentTypeService {
         return List.of();
     }
 
-    private static List<CreateInvestmentResponse> getCreateInvestmentResponses(List<InvestmentType> investmentTypes) {
-        return investmentTypes.stream().map(CreateInvestmentResponse::new).toList();
+    private List<CreateInvestmentResponse> getCreateInvestmentResponses(List<InvestmentType> investmentTypes) {
+        List<CreateInvestmentResponse> responses = new ArrayList<>();
+        for (InvestmentType investmentType : investmentTypes) {
+            List<String> allowedLevelText = userLevelService.getUserLevelByIdIn(investmentType.getAllowedLevels());
+            investmentType.setAllowedLevels(allowedLevelText);
+            responses.add(new CreateInvestmentResponse(investmentType));
+        }
+        return responses;
     }
 
     public void createInvestmentType(CreateInvestmentRequest createInvestmentRequest) {
