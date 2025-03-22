@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Investment Dashboard</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<header>
+    <nav>
+        <div class="logo">
+            <img th:src="@{/images/logo.png}" alt="Logo" width="50">
+            <h1>Investment Dashboard</h1>
+        </div>
+        <ul class="nav-links">
+            <li><a th:href="@{/ui/investment-types}">Investments</a></li>
+            <li><a th:href="@{/ui/investment-types/create}">Add Investment</a></li>
+        </ul>
+    </nav>
+</header>
+</body>
+</html>
