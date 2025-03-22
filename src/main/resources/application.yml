@@ -1,6 +1,8 @@
 spring:
   application:
     name: nft
+  profiles:
+    active: ${env_name:LOCAL}
   data:
     mongodb:
       uri: mongodb://root:secret@localhost:27017/nftdb

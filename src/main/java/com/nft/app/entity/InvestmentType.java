@@ -12,7 +12,7 @@ import java.util.List;
 
 @Getter
 @Setter
-@Document(collection = "investment_types")
+@Document(collection = "investmentTypes")
 @NoArgsConstructor
 public class InvestmentType {
     @Id

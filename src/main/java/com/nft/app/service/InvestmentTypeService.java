@@ -1,5 +1,6 @@
 package com.nft.app.service;
 
+import com.mongodb.DuplicateKeyException;
 import com.nft.app.dto.request.CreateInvestmentRequest;
 import com.nft.app.dto.response.CreateInvestmentResponse;
 import com.nft.app.entity.InvestmentType;
@@ -54,6 +55,8 @@ public class InvestmentTypeService {
         try {
             InvestmentType investmentTypeEntity = new InvestmentType(createInvestmentRequest);
             investmentTypeRepository.save(investmentTypeEntity);
+        } catch (DuplicateKeyException e) {
+            throw new InvestmentTypException(ErrorCode.DUPLICATE_INVESTMENT);
         } catch (Exception e) {
             throw new InvestmentTypException(ErrorCode.CREATE_INVESTMENT_FAILED);
         }
@@ -84,6 +87,8 @@ public class InvestmentTypeService {
             investmentTypeById.get().setAllowedLevels(createInvestmentRequest.getAllowedLevels());
             investmentTypeById.get().setName(createInvestmentRequest.getName());
             investmentTypeRepository.save(investmentTypeById.get());
+        } catch (DuplicateKeyException e) {
+            throw new InvestmentTypException(ErrorCode.DUPLICATE_INVESTMENT);
         } catch (Exception e) {
             throw new InvestmentTypException(ErrorCode.UPDATE_INVESTMENT_FAILED);
         }
