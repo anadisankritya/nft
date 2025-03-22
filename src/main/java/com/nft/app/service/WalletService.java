@@ -83,4 +83,18 @@ public class WalletService {
     }
   }
 
+  public List<?> getPendingRequests() {
+    return withdrawRequestRepository.findByStatus("PENDING");
+  }
+
+  public void updateRequestStatus(String id, String status, String comment) {
+    Optional<WithdrawRequest> optionalRequest = withdrawRequestRepository.findById(id);
+    if (optionalRequest.isPresent()) {
+      WithdrawRequest request = optionalRequest.get();
+      request.setStatus(status);
+      request.setComment(comment);
+      withdrawRequestRepository.save(request);
+    }
+  }
+
 }

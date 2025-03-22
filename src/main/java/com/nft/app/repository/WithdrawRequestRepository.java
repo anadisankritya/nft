@@ -10,5 +10,6 @@ import java.util.List;
 public interface WithdrawRequestRepository extends MongoRepository<WithdrawRequest, String> {
 
   List<WithdrawRequest> findByEmailAndStatus(String email, String status);
+  List<WithdrawRequest> findByStatus(String status);
 
 }
