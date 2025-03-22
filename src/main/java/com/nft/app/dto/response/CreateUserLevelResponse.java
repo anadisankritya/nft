@@ -1,5 +1,6 @@
 package com.nft.app.dto.response;
 
+import com.nft.app.dto.request.ImageData;
 import com.nft.app.entity.UserLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,12 +17,15 @@ public class CreateUserLevelResponse {
     private String id;
     private String name;
     private Long seq;
-    private String imageId;
+    private ImageData imageData;
+    private Boolean baseLevel;
 
-    public CreateUserLevelResponse(UserLevel userLevel) {
+
+    public CreateUserLevelResponse(UserLevel userLevel, ImageData imageData) {
         this.id = userLevel.getId();
         this.name = userLevel.getName();
         this.seq = userLevel.getSeq();
-        this.imageId = userLevel.getImageId();
+        this.imageData = imageData;
+        this.baseLevel = userLevel.isBaseLevel();
     }
 }

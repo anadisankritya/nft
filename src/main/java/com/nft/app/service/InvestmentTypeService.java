@@ -23,14 +23,9 @@ public class InvestmentTypeService {
 
     public List<CreateInvestmentResponse> getAllInvestmentTypes(Integer page, Integer size) {
         if (Objects.nonNull(page) && Objects.nonNull(size)) {
-            if (page == 0) {
-                List<InvestmentType> investmentTypes = investmentTypeRepository.findAll();
-                return getCreateInvestmentResponses(investmentTypes);
-            } else {
-                Pageable pageable = PageRequest.of(page - 1, size);
-                Page<InvestmentType> investmentTypePage = investmentTypeRepository.findAll(pageable);
-                return getCreateInvestmentResponses(investmentTypePage.getContent());
-            }
+            Pageable pageable = PageRequest.of(page, size);
+            Page<InvestmentType> investmentTypePage = investmentTypeRepository.findAll(pageable);
+            return getCreateInvestmentResponses(investmentTypePage.getContent());
         }
         return List.of();
     }

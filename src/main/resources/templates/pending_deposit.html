@@ -13,26 +13,26 @@
         .mobile-card { display: none; }
         .table-hover tbody tr:hover { background-color: #f8f9fa; }
         .pagination-container {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
         }
         .page-size-select { width: 100px; }
         @media (max-width: 768px) {
-          .desktop-table { display: none; }
-          .mobile-card { display: block; }
-          .card-item {
-            margin-bottom: 15px;
-            padding: 20px;
-            border: 1px solid #e9ecef;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-          }
-          .pagination-container {
-            flex-direction: column;
-            gap: 15px;
-          }
+            .desktop-table { display: none; }
+            .mobile-card { display: block; }
+            .card-item {
+                margin-bottom: 15px;
+                padding: 20px;
+                border: 1px solid #e9ecef;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .pagination-container {
+                flex-direction: column;
+                gap: 15px;
+            }
         }
     </style>
 </head>
@@ -74,7 +74,7 @@
     <!-- Mobile Cards -->
     <div class="mobile-card" id="mobileCardBody"></div>
 
-    <!-- Pagination Controls (if needed) -->
+    <!-- Pagination Controls -->
     <div class="pagination-container" id="paginationContainer" style="display: none;">
         <div class="d-flex align-items-center gap-2">
             <span class="text-muted small">Items per page:</span>
@@ -100,181 +100,211 @@
 <script>
     // Initialize Toastr options
     toastr.options = {
-      positionClass: "toast-top-right",
-      progressBar: true,
-      timeOut: 3000
+        positionClass: "toast-top-right",
+        progressBar: true,
+        timeOut: 3000,
+        preventDuplicates: true
     };
 
-    let currentPage = 0;
+    let currentPage = 0; // 0-based index for backend
     let pageSize = 10;
     let totalPages = 1;
     let totalItems = 0;
 
     $(document).ready(function() {
-      loadData();
+        loadData();
     });
 
-    // Load pending withdraw requests using jQuery AJAX
     function loadData() {
-      $.ajax({
-        url: '/nft/wallet/api/v1/deposit-request',
-        type: 'GET',
-        data: { status : 'PENDING', page: currentPage, size: pageSize },
-        dataType: 'json',
-        success: function(data) {
-          // If your API returns pagination details, update totalItems and totalPages accordingly
-          totalItems = data.totalElements || data.length;
-          totalPages = data.totalPages || 1;
-          populateData(data.data || data);
-          if(totalPages > 1) {
-            $('#paginationContainer').show();
-            setupPagination();
-          } else {
-            $('#paginationContainer').hide();
-          }
-        },
-        error: function() {
-          toastr.error('Failed to load data');
-        }
-      });
+        $.ajax({
+            url: '/nft/wallet/api/v1/deposit-request',
+            type: 'GET',
+            data: {
+                status: 'PENDING',
+                page: currentPage,
+                size: pageSize
+            },
+            success: function(data) {
+                totalItems = data.totalElements;
+                totalPages = data.totalPages;
+                populateData(data.content || data.data || data);
+
+                if(totalPages > 1) {
+                    $('#paginationContainer').show();
+                    setupPagination();
+                } else {
+                    $('#paginationContainer').hide();
+                }
+            },
+            error: function() {
+                toastr.error('Failed to load deposit requests');
+            }
+        });
     }
 
-    function populateData(items) {
-      const tbody = $('#tableBody').empty();
-      const mobile = $('#mobileCardBody').empty();
-
-      if (items.length === 0) {
-        tbody.append(`
-          <tr>
-            <td colspan="8" class="text-center py-4 text-muted">No deposit requests found</td>
-          </tr>
-        `);
-        mobile.append(`
-          <div class="card-item text-center text-muted">No deposit requests found</div>
-        `);
-        return;
-      }
-
-      $.each(items, function(index, item) {
-        const itemNumber = index + 1;
-
-        // Desktop Row
-        tbody.append(`
-          <tr>
-            <td class="counter-col text-muted">${itemNumber}</td>
-            <td>${item.email}</td>
-            <td>${item.amount}</td>
-            <td>${item.walletName}</td>
-            <td>${item.transactionId}</td>
-            <td>${item.status}</td>
-            <td>${item.createdDate}</td>
-            <td>
-              <input type="text" id="comment-${item.id}" placeholder="Add a comment" class="form-control form-control-sm" />
-            </td>
-            <td class="action-col">
-              <button class="btn btn-sm btn-outline-success me-1" onclick="updateStatus('${item.id}', 'SUCCESS')">
-                <i class="bi bi-check-lg"></i>
-              </button>
-              <button class="btn btn-sm btn-outline-danger" onclick="updateStatus('${item.id}', 'FAILED')">
-                <i class="bi bi-x-lg"></i>
-              </button>
-            </td>
-          </tr>
-        `);
-
-        // Mobile Card
-        mobile.append(`
-          <div class="card-item">
-            <div class="d-flex justify-content-between align-items-center">
-              <div>
-                <div class="text-muted small">#${itemNumber}</div>
-                <div><strong>Email:</strong> ${item.email}</div>
-                <div><strong>Amount:</strong> ${item.amount}</div>
-                <div><strong>Wallet Name:</strong> ${item.walletName}</div>
-                <div><strong>Transaction Id:</strong> ${item.transactionId}</div>
-                <div><strong>Status:</strong> ${item.status}</div>
-                <div><strong>Raised On:</strong> ${item.createdDate}</div>
-                <div>
-                  <input type="text" id="comment-${item.id}" placeholder="Comment" class="form-control form-control-sm" />
-                </div>
-              </div>
-              <div class="d-flex flex-column gap-1">
-                <button class="btn btn-sm btn-outline-success" onclick="updateStatus('${item.id}', 'SUCCESS')">
-                  <i class="bi bi-check-lg"></i>
-                </button>
-                <button class="btn btn-sm btn-outline-danger" onclick="updateStatus('${item.id}', 'FAILED')">
-                  <i class="bi bi-x-lg"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-        `);
-      });
-    }
-
-    // Update request status using jQuery AJAX
-    function updateStatus(id, status) {
-      const comment1 = $('#comment-' + id).val();
-      $.ajax({
-        url: '/nft/wallet/api/v1/deposit-action',
-        type: 'POST',
-        data: { id: id, status: status, comment: comment1 },
-        dataType: 'json',
-        success: function(response) {
-          toastr.success(response.displayMessage || 'Status updated');
-          loadData();
-        },
-        error: function(xhr) {
-          let errMsg = 'Operation failed';
-          if (xhr.responseJSON && xhr.responseJSON.displayMessage) {
-            errMsg = xhr.responseJSON.displayMessage;
-          }
-          toastr.error(errMsg);
-        }
-      });
-    }
-
-    // Pagination setup
     function setupPagination() {
-      const pagination = $('#pagination').empty();
-      const maxVisiblePages = 5;
-      let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-      let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-      if (endPage - startPage < maxVisiblePages - 1) {
-        startPage = Math.max(1, endPage - maxVisiblePages + 1);
-      }
-      // Previous Button
-      pagination.append(`
-        <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-          <a class="page-link" href="#" onclick="changePage(${currentPage - 1})">&laquo;</a>
-        </li>
-      `);
-      // Page Numbers
-      for (let i = startPage; i <= endPage; i++) {
+        const pagination = $('#pagination').empty();
+        const maxVisiblePages = 5;
+        const currentPage1Based = currentPage + 1;
+
+        let startPage = Math.max(1, currentPage1Based - Math.floor(maxVisiblePages/2));
+        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+        if (endPage - startPage < maxVisiblePages - 1) {
+            startPage = Math.max(1, endPage - maxVisiblePages + 1);
+        }
+
+        // Previous Button
         pagination.append(`
-          <li class="page-item ${i === currentPage ? 'active' : ''}">
-            <a class="page-link" href="#" onclick="changePage(${i})">${i}</a>
-          </li>
+            <li class="page-item ${currentPage === 0 ? 'disabled' : ''}">
+                <a class="page-link" href="#" onclick="changePage(${currentPage - 1})">&laquo;</a>
+            </li>
         `);
-      }
-      // Next Button
-      pagination.append(`
-        <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
-          <a class="page-link" href="#" onclick="changePage(${currentPage + 1})">&raquo;</a>
-        </li>
-      `);
+
+        // Page Numbers
+        for (let i = startPage; i <= endPage; i++) {
+            const pageIndex0Based = i - 1;
+            pagination.append(`
+                <li class="page-item ${pageIndex0Based === currentPage ? 'active' : ''}">
+                    <a class="page-link" href="#" onclick="changePage(${pageIndex0Based})">${i}</a>
+                </li>
+            `);
+        }
+
+        // Next Button
+        pagination.append(`
+            <li class="page-item ${currentPage >= totalPages - 1 ? 'disabled' : ''}">
+                <a class="page-link" href="#" onclick="changePage(${currentPage + 1})">&raquo;</a>
+            </li>
+        `);
     }
 
     function changePage(newPage) {
-      if (newPage < 1 || newPage > totalPages) return;
-      currentPage = newPage;
-      loadData();
+        if (newPage < 0 || newPage >= totalPages) return;
+        currentPage = newPage;
+        loadData();
     }
 
     function changePageSize() {
-      pageSize = parseInt($('#pageSize').val());
-      currentPage = 1;
-      loadData();
+        pageSize = parseInt($('#pageSize').val());
+        currentPage = 0;
+        loadData();
+    }
+
+    function populateData(items) {
+        const tbody = $('#tableBody').empty();
+        const mobile = $('#mobileCardBody').empty();
+
+        if (items.length === 0) {
+            tbody.append(`
+                <tr>
+                    <td colspan="9" class="text-center py-4 text-muted">No deposit requests found</td>
+                </tr>
+            `);
+            mobile.append(`
+                <div class="card-item text-center text-muted">No deposit requests found</div>
+            `);
+            return;
+        }
+
+        const startIndex = currentPage * pageSize;
+
+        $.each(items, function(index, item) {
+            const itemNumber = startIndex + index + 1;
+
+            // Desktop Row
+            tbody.append(`
+                <tr>
+                    <td class="counter-col text-muted">${itemNumber}</td>
+                    <td>${item.email}</td>
+                    <td>${item.amount}</td>
+                    <td>${item.walletName}</td>
+                    <td>${item.transactionId}</td>
+                    <td><span class="badge bg-warning text-dark">${item.status}</span></td>
+                    <td>${new Date(item.createdDate).toLocaleString()}</td>
+                    <td>
+                        <input type="text" id="comment-${item.id}"
+                               placeholder="Add comment"
+                               class="form-control form-control-sm"
+                               value="${item.comment || ''}"/>
+                    </td>
+                    <td class="action-col">
+                        <button class="btn btn-sm btn-outline-success me-1"
+                                onclick="updateStatus('${item.id}', 'SUCCESS')">
+                            <i class="bi bi-check-lg"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger"
+                                onclick="updateStatus('${item.id}', 'FAILED')">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    </td>
+                </tr>
+            `);
+
+            // Mobile Card
+            mobile.append(`
+                <div class="card-item">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div style="flex: 1">
+                            <div class="text-muted small mb-2">#${itemNumber}</div>
+                            <div class="mb-1"><strong>Email:</strong> ${item.email}</div>
+                            <div class="mb-1"><strong>Amount:</strong> ${item.amount}</div>
+                            <div class="mb-1"><strong>Wallet:</strong> ${item.walletName}</div>
+                            <div class="mb-1"><strong>TX ID:</strong> ${item.transactionId}</div>
+                            <div class="mb-1"><strong>Status:</strong>
+                                <span class="badge bg-warning text-dark">${item.status}</span>
+                            </div>
+                            <div class="mb-1"><strong>Date:</strong>
+                                ${new Date(item.createdDate).toLocaleString()}
+                            </div>
+                            <div class="mt-2">
+                                <input type="text" id="comment-${item.id}"
+                                       placeholder="Add comment"
+                                       class="form-control form-control-sm"
+                                       value="${item.comment || ''}"/>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-column gap-1 ms-2">
+                            <button class="btn btn-sm btn-outline-success"
+                                    onclick="updateStatus('${item.id}', 'SUCCESS')">
+                                <i class="bi bi-check-lg"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger"
+                                    onclick="updateStatus('${item.id}', 'FAILED')">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `);
+        });
+    }
+
+    function updateStatus(id, status) {
+        const comment = $('#comment-' + id).val();
+
+        if (!comment && status === 'FAILED') {
+            toastr.warning('Please add a comment for failed transactions');
+            return;
+        }
+
+        $.ajax({
+            url: '/nft/wallet/api/v1/deposit-action',
+            type: 'POST',
+            data: {
+                id: id,
+                status: status,
+                comment: comment
+            },
+            success: function(response) {
+                toastr.success(response.displayMessage || 'Status updated successfully');
+                loadData();
+            },
+            error: function(xhr) {
+                const errorMsg = xhr.responseJSON?.displayMessage || 'Failed to update status';
+                toastr.error(errorMsg);
+            }
+        });
     }
 </script>
 </body>

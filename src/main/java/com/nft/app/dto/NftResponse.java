@@ -24,6 +24,10 @@ public record NftResponse<T>(
     this("200", "SUCCESS", displayMessage, data);
   }
 
+  public NftResponse(String statusCode, String displayMessage, T data) {
+    this("200", "SUCCESS", displayMessage, data);
+  }
+
   public NftResponse(T data) {
     this("", data);
   }

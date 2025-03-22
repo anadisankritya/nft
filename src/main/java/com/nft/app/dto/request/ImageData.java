@@ -1,10 +1,12 @@
 package com.nft.app.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Getter
@@ -18,4 +20,6 @@ public class ImageData {
     private String image;
     @NotBlank(message = "content type is required")
     private String contentType;
+    @JsonIgnore
+    private String imageId;
 }
