@@ -42,11 +42,12 @@ public class WalletController {
   }
 
   @GetMapping("/api/v1/withdrawal-request")
-  public List<?> withdrawalRequests(@RequestParam(required = false) Integer page,
-                                    @RequestParam(required = false) Integer size,
-                                    @RequestParam List<String> status) {
+  public ResponseEntity<NftResponse<List<?>>> withdrawalRequests(@RequestParam(required = false) Integer page,
+                                                                 @RequestParam(required = false) Integer size,
+                                                                 @RequestParam List<String> status) {
     Pageable pageable = PageRequest.of(page, size);
-    return walletService.getWithdrawalRequests(status, pageable);
+    var list = walletService.getWithdrawalRequests(status, pageable);
+    return ResponseEntity.ok(new NftResponse<>(list));
   }
 
   @PostMapping("/api/v1/withdrawal-action")
@@ -62,11 +63,12 @@ public class WalletController {
   }
 
   @GetMapping("/api/v1/deposit-request")
-  public List<?> depositRequests(@RequestParam(required = false) Integer page,
-                                 @RequestParam(required = false) Integer size,
-                                 @RequestParam List<String> status) {
+  public ResponseEntity<NftResponse<List<?>>> depositRequests(@RequestParam(required = false) Integer page,
+                                                              @RequestParam(required = false) Integer size,
+                                                              @RequestParam List<String> status) {
     Pageable pageable = PageRequest.of(page, size);
-    return walletService.getDepositRequests(status, pageable);
+    var list = walletService.getDepositRequests(status, pageable);
+    return ResponseEntity.ok(new NftResponse<>(list));
   }
 
   @PostMapping("/api/v1/deposit-action")
