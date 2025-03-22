@@ -85,8 +85,12 @@ public class WalletService {
     }
   }
 
-  public List<?> getWithdrawalRequests(String status, Pageable pageable) {
-    return withdrawRequestRepository.findByStatus(status, pageable);
+  public List<?> getWithdrawalRequests(List<String> statusList, Pageable pageable) {
+    if (statusList.contains("PENDING")) {
+      return withdrawRequestRepository.findByStatusIn(statusList, pageable);
+    }
+
+    return withdrawRequestRepository.findByStatusInOrderByUpdatedDateDesc(statusList, pageable);
   }
 
   public void updateWithdrawalRequest(String id, String status, String comment) {
@@ -96,9 +100,9 @@ public class WalletService {
       switch (status) {
         case "SUCCESS" -> updateWithdrawRequest(status, comment, withdrawRequest);
         case "FAILED" -> {
-          UserWallet userWallet = userWalletRepository.findByEmail(withdrawRequest.getEmail());
-          userWallet.setBalance(userWallet.getBalance() + withdrawRequest.getTotalAmount());
-          userWalletRepository.save(userWallet);
+//          UserWallet userWallet = userWalletRepository.findByEmail(withdrawRequest.getEmail());
+//          userWallet.setBalance(userWallet.getBalance() + withdrawRequest.getTotalAmount());
+//          userWalletRepository.save(userWallet);
           updateWithdrawRequest(status, comment, withdrawRequest);
         }
         default -> throw new RuntimeException("invalid action");
@@ -112,8 +116,11 @@ public class WalletService {
     withdrawRequestRepository.save(withdrawRequest);
   }
 
-  public List<?> getDepositRequests(String status, Pageable pageable) {
-    return depositRequestRepository.findByStatus(status, pageable);
+  public List<?> getDepositRequests(List<String> statusList, Pageable pageable) {
+    if (statusList.contains("PENDING")) {
+      return depositRequestRepository.findByStatusIn(statusList, pageable);
+    }
+    return depositRequestRepository.findByStatusInOrderByUpdatedDateDesc(statusList, pageable);
   }
 
   public void updateDepositRequest(String id, String status, String comment) {

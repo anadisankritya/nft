@@ -41,10 +41,10 @@ public class WalletController {
         "your money will be credited in 72 hours", null));
   }
 
-  @GetMapping("/api/v1/withdrawal")
+  @GetMapping("/api/v1/withdrawal-request")
   public List<?> withdrawalRequests(@RequestParam(required = false) Integer page,
                                     @RequestParam(required = false) Integer size,
-                                    @RequestParam String status) {
+                                    @RequestParam List<String> status) {
     Pageable pageable = PageRequest.of(page, size);
     return walletService.getWithdrawalRequests(status, pageable);
   }
@@ -61,10 +61,10 @@ public class WalletController {
     return ResponseEntity.ok(new NftResponse<>("done", null));
   }
 
-  @GetMapping("/api/v1/deposit")
+  @GetMapping("/api/v1/deposit-request")
   public List<?> depositRequests(@RequestParam(required = false) Integer page,
                                  @RequestParam(required = false) Integer size,
-                                 @RequestParam String status) {
+                                 @RequestParam List<String> status) {
     Pageable pageable = PageRequest.of(page, size);
     return walletService.getDepositRequests(status, pageable);
   }

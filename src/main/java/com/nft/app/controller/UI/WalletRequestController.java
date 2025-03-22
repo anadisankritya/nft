@@ -19,5 +19,14 @@ public class WalletRequestController {
     return "pending_deposit";
   }
 
+  @GetMapping("/withdrawal-history")
+  public String showWithdrawHistoryPage() {
+    return "withdrawal_history";
+  }
+
+  @GetMapping("/deposit-history")
+  public String showDepositHistoryPage() {
+    return "deposit_history";
+  }
 
 }

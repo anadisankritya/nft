@@ -10,5 +10,7 @@ import java.util.List;
 @Repository
 public interface DepositRequestRepository extends MongoRepository<DepositRequest, String> {
 
-  List<DepositRequest> findByStatus(String status, Pageable pageable);
+  List<DepositRequest> findByStatusIn(List<String> statusList, Pageable pageable);
+  List<DepositRequest> findByStatusInOrderByUpdatedDateDesc(List<String> statusList, Pageable pageable);
+
 }

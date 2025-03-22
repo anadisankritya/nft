@@ -117,7 +117,7 @@
     // Load pending withdraw requests using jQuery AJAX
     function loadData() {
       $.ajax({
-        url: '/nft/wallet/api/v1/deposit',
+        url: '/nft/wallet/api/v1/deposit-request',
         type: 'GET',
         data: { status : 'PENDING', page: currentPage, size: pageSize },
         dataType: 'json',
@@ -146,11 +146,11 @@
       if (items.length === 0) {
         tbody.append(`
           <tr>
-            <td colspan="8" class="text-center py-4 text-muted">No withdraw requests found</td>
+            <td colspan="8" class="text-center py-4 text-muted">No deposit requests found</td>
           </tr>
         `);
         mobile.append(`
-          <div class="card-item text-center text-muted">No withdraw requests found</div>
+          <div class="card-item text-center text-muted">No deposit requests found</div>
         `);
         return;
       }
