@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<!-- Include Header -->
+<div th:replace="fragments/header :: header"></div>
+
+<main>
+    <h2>Investment Types</h2>
+    <table border="1">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Metadata</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="type : ${investmentTypes}">
+            <td th:text="${type._id}"></td>
+            <td th:text="${type.name}"></td>
+            <td>
+                <ul>
+                    <li th:each="entry : ${type.metadata}">
+                        <span th:text="${entry.key + ': ' + entry.value}"></span>
+                    </li>
+                </ul>
+            </td>
+            <td>
+                <a th:href="@{/ui/investment-types/edit/{id}(id=${type._id})}">Edit</a>
+                <a th:href="@{/ui/investment-types/delete/{id}(id=${type._id})}" onclick="return confirm('Are you sure?')">Delete</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- Pagination -->
+    <div class="pagination">
+        <a th:href="@{/ui/investment-types(page=${currentPage - 1}, size=${pageSize})}" th:if="${currentPage > 1}">Previous</a>
+        <a th:href="@{/ui/investment-types(page=${currentPage + 1}, size=${pageSize})}">Next</a>
+    </div>
+</main>
+
+<!-- Include Footer -->
+<div th:replace="fragments/footer :: footer"></div>
+</body>
+</html>
