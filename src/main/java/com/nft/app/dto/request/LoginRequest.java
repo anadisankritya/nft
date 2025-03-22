@@ -1,10 +1,9 @@
 package com.nft.app.dto.request;
 
-import lombok.Data;
+public record LoginRequest(
+    String email,
+    String password,
+    String otp
+) {
 
-@Data
-public class LoginRequest {
-  private String email;
-  private String password;
-  private String otp;
 }

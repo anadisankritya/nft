@@ -32,7 +32,12 @@ public enum ErrorCode {
   CREATE_INVESTMENT_FAILED("118",BAD_REQUEST, "Create investment type failed."),
   INVALID_INVESTMENT_TYPE("119",NOT_FOUND, "Invalid investment type id"),
   UPDATE_INVESTMENT_FAILED("118",BAD_REQUEST, "Update investment type failed."),;
-
+  WALLET_NOT_FOUND("116", INTERNAL_SERVER_ERROR, "Wallet linked to user not found"),
+  MINIMUM_WITHDRAW_ERROR("117", BAD_REQUEST, "Minimum withdraw amount should be 50"),
+  NEW_USER_WITHDRAW("118", BAD_REQUEST, "Cannot withdraw until 7 days of registration"),
+  PENDING_WITHDRAW_REQUEST("119", BAD_REQUEST, "Previous withdraw request is already pending"),
+  INSUFFICIENT_FUNDS("120", BAD_REQUEST, "Insufficient wallet amount"),
+  INVALID_PASSWORD("121", UNAUTHORIZED, "Invalid password");
 
   private final String code;
   private final HttpStatus httpStatus;

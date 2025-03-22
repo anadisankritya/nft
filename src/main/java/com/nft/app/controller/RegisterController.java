@@ -27,26 +27,26 @@ public class RegisterController {
   }
 
   @PostMapping("/api/v1/send-phone-otp")
-  public ResponseEntity<NftResponse<String>> sendPhoneOtp(@RequestParam String mobileNo) {
+  public ResponseEntity<NftResponse<Void>> sendPhoneOtp(@RequestParam String mobileNo) {
     userService.sendMobileOtp(mobileNo);
     return ResponseEntity.ok(new NftResponse<>("OTP sent", null));
   }
 
   @PostMapping("/api/v1/signup")
-  public ResponseEntity<NftResponse<String>> signup(@RequestBody @Valid UserRequest userRequest) {
+  public ResponseEntity<NftResponse<Void>> signup(@RequestBody @Valid UserRequest userRequest) {
     userService.registerUser(userRequest);
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(new NftResponse<>("User registered", null));
   }
 
   @PostMapping("/api/v1/reset-password")
-  public ResponseEntity<NftResponse<String>> resetPassword(@RequestParam String email) {
+  public ResponseEntity<NftResponse<Void>> resetPassword(@RequestParam String email) {
     userService.sendPasswordResetOtp(email);
     return ResponseEntity.ok(new NftResponse<>("Password reset otp sent", null));
   }
 
   @PostMapping("/api/v1/update-password")
-  public ResponseEntity<NftResponse<String>> updatePassword(@RequestBody UserRequest userRequest) {
+  public ResponseEntity<NftResponse<Void>> updatePassword(@RequestBody UserRequest userRequest) {
     userService.updatePassword(userRequest);
     return ResponseEntity.ok(new NftResponse<>("Password updated", null));
 
