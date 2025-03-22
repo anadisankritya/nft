@@ -1,16 +1,27 @@
 package com.nft.app.entity;
 
+import com.nft.app.dto.request.CreateInvestmentRequest;
 import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.Map;
+import java.util.List;
 
-@Data
+@Getter
+@Setter
 @Document(collection = "investment_types")
+@NoArgsConstructor
 public class InvestmentType {
     @Id
-    private String _id;
+    private String id;
     private String name;
-    private Map<String, String> metadata; // Dynamic key-value pairs for metadata
+    private List<String> allowedLevels;
+
+    public InvestmentType(CreateInvestmentRequest createInvestmentRequest) {
+        this.name = createInvestmentRequest.getName();
+        this.allowedLevels = createInvestmentRequest.getAllowedLevels();
+    }
 }
