@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -167,7 +168,17 @@ public class UserService {
     User user = getUser(email);
 
     UserWallet userWallet = userWalletRepository.findByEmail(user.getEmail());
+    Optional<WalletMaster> walletMasterOptional = walletMasterRepository.findById(user.getWalletId());
+    if (walletMasterOptional.isEmpty()) {
+      throw new NftException(ErrorCode.WALLET_NOT_FOUND);
+    }
+
+    WalletMaster walletMaster = walletMasterOptional.get();
+    UserDetails.WalletDetails walletDetails =
+        new UserDetails.WalletDetails(walletMaster.getTrc20Address(), walletMaster.getBep20Address(), userWallet.getBalance());
+
     UserDetails userDetails = new UserDetails(user);
+    userDetails.setWalletDetails(walletDetails);
     userDetails.setWalletBalance(userWallet.getBalance());
     return userDetails;
   }

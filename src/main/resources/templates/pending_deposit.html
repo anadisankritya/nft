@@ -226,7 +226,7 @@
                     <td><span class="badge bg-warning text-dark">${item.status}</span></td>
                     <td>${new Date(item.createdDate).toLocaleString()}</td>
                     <td>
-                        <input type="text" id="comment-${item.id}"
+                        <input type="text" id="comment-desk-${item.id}"
                                placeholder="Add comment"
                                class="form-control form-control-sm"
                                value="${item.comment ? item.comment : ''}"/>
@@ -252,8 +252,8 @@
                             <div class="text-muted small mb-2">#${itemNumber}</div>
                             <div class="mb-1"><strong>Email:</strong> ${item.email}</div>
                             <div class="mb-1"><strong>Amount:</strong> ${item.amount}</div>
-                            <div class="mb-1"><strong>Wallet:</strong> ${item.walletName}</div>
-                            <div class="mb-1"><strong>TX ID:</strong> ${item.transactionId}</div>
+                            <div class="mb-1"><strong>Wallet Name:</strong> ${item.walletName}</div>
+                            <div class="mb-1"><strong>TXN ID:</strong> ${item.transactionId}</div>
                             <div class="mb-1"><strong>Status:</strong>
                                 <span class="badge bg-warning text-dark">${item.status}</span>
                             </div>
@@ -261,7 +261,7 @@
                                 ${new Date(item.createdDate).toLocaleString()}
                             </div>
                             <div class="mt-2">
-                                <input type="text" id="comment-${item.id}"
+                                <input type="text" id="comment-mob-${item.id}"
                                        placeholder="Add comment"
                                        class="form-control form-control-sm"
                                        value="${item.comment ? item.comment : ''}"/>
@@ -284,11 +284,10 @@
     }
 
     function updateStatus(id, status) {
-        const comment = $('#comment-' + id).val();
+        let commentAns = $('#comment-desk-' + id).val();
 
-        if (!comment && status === 'FAILED') {
-            toastr.warning('Please add a comment for failed transactions');
-            return;
+        if (!commentAns) {
+        commentAns = $('#comment-mob-' + id).val();
         }
 
         $.ajax({
@@ -297,7 +296,7 @@
             data: {
                 id: id,
                 status: status,
-                comment: comment
+                comment: commentAns
             },
             success: function(response) {
                 toastr.success(response.displayMessage || 'Status updated successfully');

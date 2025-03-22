@@ -43,6 +43,10 @@ public class WalletService {
     if (walletMasterOptional.isEmpty()) {
       throw new NftException(ErrorCode.WALLET_NOT_FOUND);
     }
+    boolean transactionIdUsed = depositRequestRepository.existsByStatusAndTransactionId("SUCCESS", fundDepositRequest.transactionId());
+    if (transactionIdUsed) {
+      throw new NftException(ErrorCode.TRANSACTION_ID_ALREADY_PRESENT);
+    }
     String walletName = walletMasterOptional.get().getWalletName();
     DepositRequest depositRequest = new DepositRequest(user.getEmail(), walletName, fundDepositRequest);
     depositRequestRepository.save(depositRequest);
@@ -101,10 +105,8 @@ public class WalletService {
       switch (status) {
         case "SUCCESS" -> updateWithdrawRequest(status, comment, withdrawRequest);
         case "FAILED" -> {
-//          UserWallet userWallet = userWalletRepository.findByEmail(withdrawRequest.getEmail());
-//          userWallet.setBalance(userWallet.getBalance() + withdrawRequest.getTotalAmount());
-//          userWalletRepository.save(userWallet);
           updateWithdrawRequest(status, comment, withdrawRequest);
+//          depositFunds(withdrawRequest.getEmail(), withdrawRequest.getTotalAmount());
         }
         default -> throw new NftException(ErrorCode.INVALID_REQUEST);
       }
@@ -131,14 +133,18 @@ public class WalletService {
       switch (status) {
         case "SUCCESS" -> {
           updateDepositRequest(status, comment, depositRequest);
-//          UserWallet userWallet = userWalletRepository.findByEmail(depositRequest.getEmail());
-//          userWallet.setBalance(userWallet.getBalance() + depositRequest.getAmount());
-//          userWalletRepository.save(userWallet);
+//          depositFunds(depositRequest.getEmail(), depositRequest.getAmount());
         }
         case "FAILED" -> updateDepositRequest(status, comment, depositRequest);
         default -> throw new NftException(ErrorCode.INVALID_REQUEST);
       }
     }
+  }
+
+  private void depositFunds(String email, Integer amount) {
+    UserWallet userWallet = userWalletRepository.findByEmail(email);
+    userWallet.setBalance(userWallet.getBalance() + amount);
+    userWalletRepository.save(userWallet);
   }
 
   private void updateDepositRequest(String status, String comment, DepositRequest depositRequest) {
