@@ -173,7 +173,7 @@
             <td><span class="badge bg-warning text-dark">${item.status}</span></td>
             <td>${new Date(item.createdDate).toLocaleString()}</td>
             <td>
-              <input type="text" id="comment-${item.id}" placeholder="Add a comment" class="form-control form-control-sm" value="${item.comment ? item.comment : ''}"/>
+              <input type="text" id="comment-desk-${item.id}" placeholder="Add a comment" class="form-control form-control-sm" value="${item.comment ? item.comment : ''}"/>
             </td>
             <td class="action-col">
               <button class="btn btn-sm btn-outline-success me-1" onclick="updateStatus('${item.id}', 'SUCCESS')">
@@ -199,7 +199,7 @@
                 <div><strong>Status:</strong> <span class="badge bg-warning text-dark">${item.status}</span></div>
                 <div><strong>Raised On:</strong> ${new Date(item.createdDate).toLocaleString()}</div>
                 <div>
-                  <input type="text" id="comment-${item.id}" placeholder="Comment" class="form-control form-control-sm" value="${item.comment ? item.comment : ''}"/>
+                  <input type="text" id="comment-mob-${item.id}" placeholder="Comment" class="form-control form-control-sm" value="${item.comment ? item.comment : ''}"/>
                 </div>
               </div>
               <div class="d-flex flex-column gap-1">
@@ -218,11 +218,15 @@
 
     // Update request status using jQuery AJAX
     function updateStatus(id, status) {
-      const comment = $('#comment-' + id).val();
+      let commentAns = $('#comment-desk-' + id).val();
+
+        if (!commentAns) {
+        commentAns = $('#comment-mob-' + id).val();
+        }
       $.ajax({
         url: '/nft/wallet/api/v1/withdrawal-action',
         type: 'POST',
-        data: { id: id, status: status, comment: comment },
+        data: { id: id, status: status, comment: commentAns },
         dataType: 'json',
         success: function(response) {
           toastr.success(response.displayMessage || 'Status updated successfully');
