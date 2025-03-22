@@ -26,7 +26,12 @@ public enum ErrorCode {
   INVALID_REQUEST("112", BAD_REQUEST, "Invalid request body"),
   URI_EXCEPTION("113", INTERNAL_SERVER_ERROR, "URI seems to be invalid"),
   INVALID_TOKEN("114", UNAUTHORIZED, "Unauthorized request. Invalid token"),
-  OBJECT_MAPPING_FAILED("8413", INTERNAL_SERVER_ERROR, "Object mapping failed");
+  OBJECT_MAPPING_FAILED("115", INTERNAL_SERVER_ERROR, "Object mapping failed"),
+  INVALID_LEVEL_INSERTED("116",BAD_REQUEST, "Please add levels in comma separate eg: 1,2,3"),
+  DUPLICATE_INVESTMENT("117",BAD_REQUEST, "Duplicate investment type."),
+  CREATE_INVESTMENT_FAILED("118",BAD_REQUEST, "Create investment type failed."),
+  INVALID_INVESTMENT_TYPE("119",NOT_FOUND, "Invalid investment type id"),
+  UPDATE_INVESTMENT_FAILED("118",BAD_REQUEST, "Update investment type failed."),;
 
 
   private final String code;
