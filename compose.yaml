@@ -7,4 +7,3 @@ services:
       - 'MONGO_INITDB_ROOT_USERNAME=root'
     ports:
       - '27017:27017'
-      - ''
