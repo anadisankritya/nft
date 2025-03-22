@@ -16,8 +16,8 @@ public class WithdrawRequest {
   private String id;
   private String email;
   private Integer amount;
-  private Long serviceCharge;
-  private Long totalAmount;
+  private Integer serviceCharge;
+  private Integer totalAmount;
   private String status;
   private String comment;
 
@@ -30,7 +30,7 @@ public class WithdrawRequest {
   public WithdrawRequest(String email, Integer amount) {
     this.email = email;
     this.amount = amount;
-    this.serviceCharge = (long) Math.ceil(0.05 * amount);
+    this.serviceCharge = (int) Math.ceil(0.05 * amount);
     this.totalAmount = amount + serviceCharge;
     this.status = "PENDING";
   }

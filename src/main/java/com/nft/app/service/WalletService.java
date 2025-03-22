@@ -54,18 +54,18 @@ public class WalletService {
     validateWithdrawRequest(email, amount, user, userWallet);
 
     Integer currentBalance = userWallet.getBalance();
-    int newBalance = currentBalance - amount;
+    WithdrawRequest withdrawRequest = new WithdrawRequest(email, amount);
+    int newBalance = currentBalance - withdrawRequest.getTotalAmount();
     userWallet.setBalance(newBalance);
     log.info("Email {}, current balance - {}, new balance - {}",
         email, currentBalance, newBalance);
 
     userWalletRepository.save(userWallet);
-    WithdrawRequest withdrawRequest = new WithdrawRequest(email, amount);
     withdrawRequestRepository.save(withdrawRequest);
   }
 
   private void validateWithdrawRequest(String email, Integer amount, User user, UserWallet userWallet) {
-    if (amount > 50) {
+    if (amount < 50) {
       throw new NftException(ErrorCode.MINIMUM_WITHDRAW_ERROR);
     }
 
