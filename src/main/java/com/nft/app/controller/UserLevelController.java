@@ -3,6 +3,7 @@ package com.nft.app.controller;
 import com.nft.app.dto.NftResponse;
 import com.nft.app.dto.request.CreateInvestmentRequest;
 import com.nft.app.dto.request.CreateUserLevelRequest;
+import com.nft.app.dto.request.UpdateUserLevelRequest;
 import com.nft.app.dto.response.CreateUserLevelResponse;
 import com.nft.app.service.UserLevelService;
 import jakarta.validation.Valid;
@@ -44,12 +45,12 @@ public class UserLevelController {
                 createInvestmentRequest
         );
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new NftResponse<>("User Created Successfully",null
+                .body(new NftResponse<>("201","User Created Successfully",null
                         ));
     }
 
     @PutMapping("/update")
-    public ResponseEntity<NftResponse<String>> updateInvestment(@Valid @RequestBody CreateUserLevelRequest
+    public ResponseEntity<NftResponse<String>> updateInvestment(@Valid @RequestBody UpdateUserLevelRequest
                                                                             userLevelRequest) {
         userLevelService.updateUserLevel(userLevelRequest);
         return ResponseEntity.status(HttpStatus.OK)

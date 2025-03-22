@@ -42,7 +42,7 @@ public class InvestmentTypeController {
                 createInvestmentRequest
         );
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new NftResponse<>("Investment Created Successfully",null
+                .body(new NftResponse<>("201","Investment Created Successfully",null
                         ));
     }
 
