@@ -142,20 +142,19 @@ public class UserService {
   public String loginUser(String email, String password) {
     log.info("inside UserService::loginUser for email - {}", email);
 
-    Optional<User> userOpt = userRepository.findByEmail(email);
-    if (userOpt.isPresent()) {
+    User user = getUser(email);
+    String base64EncodedPassword = user.getPassword();
+    String savedPassword = Base64Utils.decodeToString(base64EncodedPassword);
 
-      String base64EncodedPassword = userOpt.get().getPassword();
-      String savedPassword = Base64Utils.decodeToString(base64EncodedPassword);
-
-      if (savedPassword.equals(password)) {
-        return jwtUtil.generateToken(userOpt.get().getEmail());
-      }
+    if (savedPassword.equals(password)) {
+      return jwtUtil.generateToken(user.getEmail());
     }
-    throw new RuntimeException("Invalid credentials");
+    throw new NftException(ErrorCode.INVALID_PASSWORD);
   }
 
   public UserTeamResponse getUserTeamList(String email) {
+    log.info("inside UserService::getUserTeamList for email - {}", email);
+
     Optional<User> userOptional = userRepository.findByEmail(email);
     if (userOptional.isPresent()) {
       String userCode = userOptional.get().getUserCode();
