@@ -61,7 +61,7 @@ public class UserLevelService {
     public void createUserLevel(CreateUserLevelRequest userLevelRequest) {
 
         Optional<UserLevel> userLevel = userLevelRepository.findByName(
-                userLevelRequest.getName()
+                userLevelRequest.getName().toUpperCase(Locale.ROOT)
         );
         if (userLevel.isPresent())
             throw new InvestmentTypException(ErrorCode.DUPLICATE_USER_LEVEL);
@@ -94,7 +94,7 @@ public class UserLevelService {
                                           String fileId, String checkSum) {
         UserLevel userLevel = new UserLevel();
         userLevel.setSeq(seqNo);
-        userLevel.setName(userLevelRequest.getName());
+        userLevel.setName(userLevelRequest.getName().toUpperCase(Locale.ROOT));
         userLevel.setImageId(fileId);
         userLevel.setBaseLevel(userLevelRequest.getBaseLevel());
         userLevel.setCheckSum(checkSum);
@@ -105,7 +105,7 @@ public class UserLevelService {
                                           String fileId, String checkSum) {
         UserLevel userLevel = new UserLevel();
         userLevel.setSeq(seqNo);
-        userLevel.setName(userLevelRequest.getName());
+        userLevel.setName(userLevelRequest.getName().toUpperCase(Locale.ROOT));
         userLevel.setImageId(fileId);
         userLevel.setBaseLevel(userLevelRequest.getBaseLevel());
         userLevel.setCheckSum(checkSum);
