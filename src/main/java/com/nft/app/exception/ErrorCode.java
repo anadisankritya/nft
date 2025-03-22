@@ -4,10 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
-import static org.springframework.http.HttpStatus.UNAUTHORIZED;
+import static org.springframework.http.HttpStatus.*;
 
 @Getter
 @AllArgsConstructor
@@ -37,7 +34,11 @@ public enum ErrorCode {
   NEW_USER_WITHDRAW("123", BAD_REQUEST, "Cannot withdraw until 7 days of registration"),
   PENDING_WITHDRAW_REQUEST("124", BAD_REQUEST, "Previous withdraw request is already pending"),
   INSUFFICIENT_FUNDS("125", BAD_REQUEST, "Insufficient wallet amount"),
-  INVALID_PASSWORD("126", UNAUTHORIZED, "Invalid password");
+  INVALID_PASSWORD("126", UNAUTHORIZED, "Invalid password"),
+  DUPLICATE_USER_LEVEL("127", BAD_REQUEST, "Duplicate User level."),
+  CREATE_USER_LEVEL_FAILED("128", BAD_REQUEST, "Create User level failed."),
+  USER_LEVEL_NOT_FOUND("129",NOT_FOUND, "User level Not found"),
+  DUPLICATE_USER_LEVEL_IMAGE("130",CONFLICT,"Duplicate image upload for user level");
 
   private final String code;
   private final HttpStatus httpStatus;

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="false">
+    <property name="LOG_PATH" value="./logs"/>
+    <appender name="AccessFileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <encoder class="net.logstash.logback.encoder.AccessEventCompositeJsonEncoder">
+            <providers>
+                <timestamp/>
+                <version/>
+                <pattern>
+                    <pattern>
+                        {
+                        "@type" : "access",
+                        "client-host" : "%clientHost",
+                        "remote-user" : "%user",
+                        "request-method" : "%requestMethod",
+                        "request-content-type" : "%i{Content-Type}",
+                        "request-content-length" : "%i{Content-Length}",
+                        "request-url" : "%requestURL",
+                        "request-uri" : "%requestURI",
+                        "status-code" : "#asLong{%statusCode}",
+                        "bytes-sent" : "#asLong{%bytesSent}",
+                        "elapsed-time" : "#asLong{%elapsedTime}",
+                        "response-content-Length" : "%responseHeader{Content-Length}",
+                        "response-content-type" : "%responseHeader{Content-Type}",
+                        "message" : "%requestURL %statusCode",
+                        "HOSTNAME" : "${HOSTNAME}",
+                        "APPLICATION_NAME" : "${APPLICATION_NAME}"
+                        }
+                    </pattern>
+                </pattern>
+            </providers>
+        </encoder>
+        <file>${LOG_PATH}/${HOSTNAME}/${APPLICATION_NAME}-tomcat-access.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!--  rollover every day. max 30 files it will keep. total archived size will be 1 GB  -->
+            <fileNamePattern>${LOG_PATH}/${HOSTNAME}/${APPLICATION_NAME}-tomcat-access.%d{yyyy-MM-dd}.%i.gz
+            </fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+    <appender-ref ref="AccessFileAppender"/>
+
+</configuration>

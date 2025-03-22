@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <springProfile name="LOCAL">
+
+        <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>
+                    %d{dd-MM-yyyy HH:mm:ss.SSS} %magenta([%thread]) %highlight(%-5level) [%X{traceId:-}-%X{spanId:-}] %logger{36}.%M %msg%n
+                </pattern>
+            </encoder>
+        </appender>
+
+        <root level="info">
+            <appender-ref ref="STDOUT"/>
+        </root>
+    </springProfile>
+
+    <springProfile name="SIT,QA,UAT,PROD">
+        <property name="LOG_PATH" value="./logs"/>
+        <springProperty scope="context" name="APPLICATION_NAME" source="spring.application.name"/>
+        <!--  Configuration when the profile is dev  -->
+        <appender name="RollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>${LOG_PATH}/${HOSTNAME}/${APPLICATION_NAME}.log</file>
+            <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <!--  rollover every day. max 30 files it will keep. total archived size will be 1 GB  -->
+                <fileNamePattern>${LOG_PATH}/${HOSTNAME}/${APPLICATION_NAME}.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+                <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                    <maxFileSize>100MB</maxFileSize>
+                </timeBasedFileNamingAndTriggeringPolicy>
+                <maxHistory>30</maxHistory>
+                <totalSizeCap>1GB</totalSizeCap>
+            </rollingPolicy>
+        </appender>
+        <appender class="ch.qos.logback.core.ConsoleAppender" name="jsonstdout">
+            <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+                <providers>
+                    <timestamp>
+                        <timeZone>IST</timeZone>
+                        <timestampPattern>yyyy-MM-dd'T'HH:mm:ss.SSS</timestampPattern>
+                    </timestamp>
+                    <pattern>
+                        <pattern>
+                            {
+                            "service" : "appName",
+                            "level": "%p",
+                            "thread": "%thread",
+                            "trace": "%X{traceId:-}",
+                            "span": "%X{spanId:-}",
+                            "class": "%logger{40}",
+                            "message": "%m"
+                            }
+                        </pattern>
+                    </pattern>
+                    <stackTrace>
+                        <throwableConverter
+                                class="net.logstash.logback.stacktrace.ShortenedThrowableConverter">
+                            <maxDepthPerThrowable>30</maxDepthPerThrowable>
+                            <maxLength>2048</maxLength>
+                            <shortenedClassNameLength>20</shortenedClassNameLength>
+                            <rootCauseFirst>true</rootCauseFirst>
+                        </throwableConverter>
+                    </stackTrace>
+                </providers>
+            </encoder>
+        </appender>
+
+        <root level="info">
+            <appender-ref ref="RollingFile"/>
+        </root>
+        <!--  LOG "com.sh.logging.app" at TRACE level  -->
+        <logger name="com.starhealth" level="info" additivity="false">
+            <appender-ref ref="RollingFile"/>
+        </logger>
+        <logger name="org.springframework.boot" level="info" additivity="false">
+            <appender-ref ref="RollingFile"/>
+        </logger>
+    </springProfile>
+
+</configuration>
