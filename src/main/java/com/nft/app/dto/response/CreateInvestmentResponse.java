@@ -13,11 +13,11 @@ import java.util.List;
 public class CreateInvestmentResponse {
     private String id;
     private String name;
-    private List<String> allowedLevel;
+    private List<String> allowedLevels;
 
     public CreateInvestmentResponse(InvestmentType investmentType) {
         this.id = investmentType.getId();
         this.name = investmentType.getName();
-        this.allowedLevel = investmentType.getAllowedLevels();
+        this.allowedLevels = investmentType.getAllowedLevels();
     }
 }

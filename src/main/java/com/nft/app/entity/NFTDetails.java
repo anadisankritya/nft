@@ -6,25 +6,25 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @Document(collection = "userLevels")
-public class UserLevel {
+public class NFTDetails {
     @Id
     private String id;
     private String name;
-    private Long seq;
     private String imageId;
-    private boolean baseLevel;
     private String checkSum;
-    private Integer startPrice;
-    private Integer endPrice;
-    private Integer startProfit;
-    private Integer endProfit;
-    private BigDecimal handlingFees;
+    private String randomName;
+    private String ownerName;
+    private BigDecimal profit;
+    private BigDecimal buyPrice;
+    private Integer blockPeriod;
+    private String category;
+    private String InvestmentType;
+    private String allowedLevel;
+    private Boolean status;
+    private LocalDateTime createdAt;
 }

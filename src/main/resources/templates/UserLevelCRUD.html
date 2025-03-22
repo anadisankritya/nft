@@ -25,6 +25,23 @@
             border-radius: 4px;
             padding: 2px;
         }
+        .range-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin: 10px 0;
+        }
+        .range-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .range-input-wrapper input[type="range"] {
+            flex: 1;
+        }
+        .range-input-wrapper input[type="number"] {
+            width: 80px;
+        }
         @media (max-width: 768px) {
             .desktop-table { display: none; }
             .mobile-card { display: block; }
@@ -42,6 +59,9 @@
             .mobile-image-preview {
                 max-width: 80px;
                 margin-top: 10px;
+            }
+            .range-group {
+                flex-direction: column;
             }
         }
     </style>
@@ -73,6 +93,9 @@
                         <th>Name</th>
                         <th>Image</th>
                         <th>Base Level</th>
+                        <th>Price Range</th>
+                        <th>Profit Range</th>
+                        <th>Handling Fees</th>
                         <th class="action-col">Actions</th>
                     </tr>
                     </thead>
@@ -125,6 +148,46 @@
                             <input type="checkbox" class="form-check-input" id="baseLevel">
                             <label class="form-check-label" for="baseLevel">Base Level</label>
                         </div>
+
+                        <!-- New Fields -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Price Range *</label>
+                            <div class="range-group">
+                                <div class="range-input-wrapper">
+                                    <input type="range" class="form-range" id="startPriceSlider" min="0" max="10000"
+                                           oninput="updateNumberInput(this.value, 'startPrice')">
+                                    <input type="number" class="form-control" id="startPrice" step="1" required>
+                                </div>
+                                <span class="text-muted">to</span>
+                                <div class="range-input-wrapper">
+                                    <input type="range" class="form-range" id="endPriceSlider" min="0" max="10000"
+                                           oninput="updateNumberInput(this.value, 'endPrice')">
+                                    <input type="number" class="form-control" id="endPrice" step="1" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Profit Range *</label>
+                            <div class="range-group">
+                                <div class="range-input-wrapper">
+                                    <input type="range" class="form-range" id="startProfitSlider" min="0" max="10000"
+                                           oninput="updateNumberInput(this.value, 'startProfit')">
+                                    <input type="number" class="form-control" id="startProfit" step="1" required>
+                                </div>
+                                <span class="text-muted">to</span>
+                                <div class="range-input-wrapper">
+                                    <input type="range" class="form-range" id="endProfitSlider" min="0" max="10000"
+                                           oninput="updateNumberInput(this.value, 'endProfit')">
+                                    <input type="number" class="form-control" id="endProfit" step="1" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Handling Fees *</label>
+                            <input type="number" class="form-control" id="handlingFees" step="0.01" required>
+                        </div>
                     </form>
                 </div>
                 <div class="modal-footer bg-light">
@@ -164,7 +227,7 @@
         reader.onload = (event) => {
             currentImageData = {
                 name: file.name,
-                image: event.target.result.split(',')[1], // Remove data URL prefix
+                image: event.target.result.split(',')[1],
                 contentType: file.type
             };
             document.getElementById('imagePreviewContainer').innerHTML = `
@@ -176,6 +239,11 @@
 
     $(document).ready(() => loadData());
 
+    function updateNumberInput(value, targetId) {
+        $(`#${targetId}`).val(value);
+        $(`#${targetId}Slider`).val(value);
+    }
+
     function openCreate() {
         currentEditId = null;
         $('#name').val('');
@@ -183,6 +251,15 @@
         $('#imageInput').val('');
         $('#imagePreviewContainer').empty();
         currentImageData = null;
+        $('#startPrice').val(1);
+        $('#endPrice').val(2);
+        $('#startProfit').val(1);
+        $('#endProfit').val(2);
+        $('#handlingFees').val(1.4);
+        $('#startPriceSlider').val(1);
+        $('#endPriceSlider').val(2);
+        $('#startProfitSlider').val(1);
+        $('#endProfitSlider').val(2);
         $('#modalTitle').text('Create User Level');
     }
 
@@ -207,7 +284,7 @@
         if (items.length === 0) {
             tbody.append(`
                 <tr>
-                    <td colspan="5" class="text-center py-4 text-muted">
+                    <td colspan="7" class="text-center py-4 text-muted">
                         No user levels found
                     </td>
                 </tr>
@@ -234,6 +311,9 @@
                     <td class="fw-semibold">${item.name}</td>
                     <td>${imageSrc ? `<img src="${imageSrc}" class="image-preview">` : 'N/A'}</td>
                     <td>${item.baseLevel ? 'Yes' : 'No'}</td>
+                    <td>${item.startPrice} - ${item.endPrice}</td>
+                    <td>${item.startProfit} - ${item.endProfit}</td>
+                    <td>${item.handlingFees}</td>
                     <td>
                         <button class="btn btn-sm btn-outline-primary me-2"
                                 onclick="openEdit('${item.id}')">
@@ -256,7 +336,10 @@
                             <div class="fw-semibold mb-1">${item.name}</div>
                             ${imageSrc ? `<img src="${imageSrc}" class="mobile-image-preview">` : ''}
                             <div class="text-muted small mt-1">
-                                Base Level: ${item.baseLevel ? 'Yes' : 'No'}
+                                Base Level: ${item.baseLevel ? 'Yes' : 'No'}<br>
+                                Price Range: ${item.startPrice} - ${item.endPrice}<br>
+                                Profit Range: ${item.startProfit} - ${item.endProfit}<br>
+                                Handling Fees: ${item.handlingFees}
                             </div>
                         </div>
                         <div class="d-flex gap-2">
@@ -279,18 +362,21 @@
         try {
             currentEditId = id;
             const response = await fetch(`/nft/api/user-level/${id}`);
-
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.displayMessage || 'Operation failed');
-            }
-
             const { data } = await response.json();
 
             $('#name').val(data.name);
             $('#baseLevel').prop('checked', data.baseLevel);
+            $('#startPrice').val(data.startPrice);
+            $('#endPrice').val(data.endPrice);
+            $('#startProfit').val(data.startProfit);
+            $('#endProfit').val(data.endProfit);
+            $('#handlingFees').val(data.handlingFees);
+            $('#startPriceSlider').val(data.startPrice);
+            $('#endPriceSlider').val(data.endPrice);
+            $('#startProfitSlider').val(data.startProfit);
+            $('#endProfitSlider').val(data.endProfit);
 
-            if (data.image) {
+            if (data.imageData) {
                 currentImageData = data.imageData;
                 $('#imagePreviewContainer').html(`
                     <img src="data:${data.imageData.contentType};base64,${data.imageData.image}"
@@ -301,7 +387,7 @@
             $('#modalTitle').text('Edit User Level');
             new bootstrap.Modal('#editModal').show();
         } catch (error) {
-            toastr.error(error.message || 'Failed to save user level');
+            toastr.error(error.message || 'Failed to load user level');
         }
     }
 
@@ -310,6 +396,11 @@
             name: $('#name').val(),
             baseLevel: $('#baseLevel').prop('checked'),
             image: currentImageData,
+            startPrice: parseFloat($('#startPrice').val()),
+            endPrice: parseFloat($('#endPrice').val()),
+            startProfit: parseFloat($('#startProfit').val()),
+            endProfit: parseFloat($('#endProfit').val()),
+            handlingFees: parseFloat($('#handlingFees').val()),
             contentType: 'application/json'
         };
 
@@ -334,8 +425,8 @@
             const success = await response.json();
 
             toastr.success(success.displayMessage);
+            await loadData();
             $('#editModal').modal('hide');
-            loadData();
         } catch (error) {
             toastr.error(error.message || 'Failed to save user level');
         }
@@ -349,7 +440,7 @@
                 method: 'DELETE'
             });
 
-             if (!response.ok) {
+            if (!response.ok) {
                 const error = await response.json();
                 throw new Error(error.displayMessage || 'Operation failed');
             }
@@ -360,11 +451,10 @@
             }
             loadData();
         } catch (error) {
-            toastr.error(error.message || 'Failed to save user level');
+            toastr.error(error.message || 'Failed to delete user level');
         }
     }
 
-    // Pagination functions (same as previous implementation)
     function setupPagination() {
         const pagination = $('#pagination').empty();
         const maxVisiblePages = 5;
