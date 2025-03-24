@@ -3,14 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <title>Investment Dashboard</title>
-    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .nav-brand-img {
+            height: 40px;
+            margin-right: 10px;
+        }
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+        }
+    </style>
 </head>
 <body>
-<header>
+<header style="
+            width: 100%;
+            z-index: 100;
+">
+    <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
             <!-- Brand -->
-            <a class="navbar-brand" href="#">
+            <a class="navbar-brand" href="/nft/ui/">
                 <img src="https://picsum.photos/40" class="nav-brand-img" alt="Logo">
                 NFT Dashboard
             </a>
@@ -30,7 +44,7 @@
                         <a class="nav-link" href="/nft/ui/user-level/list">User Levels</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link disabled" href="#">Reports</a>
+                        <a class="nav-link" href="/nft/ui/nft/list">Add NFT</a>
                     </li>
 
                     <li class="nav-item dropdown">
@@ -46,8 +60,6 @@
                         </ul>
                     </li>
                 </ul>
-
-
 
                 <!-- Login Section -->
                 <div class="d-flex align-items-center">

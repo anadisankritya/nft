@@ -17,6 +17,6 @@ public class AdminNFTUploadController {
 
     @GetMapping("/list")
     public String getAllInvestmentTypes(Model model) {
-        return "NFTUploadCRUD";
+        return "/nft/index";
     }
 }

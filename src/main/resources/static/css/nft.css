@@ -1,0 +1,22 @@
+.counter-col { width: 80px; text-align: center; }
+.action-col { width: 150px; }
+.mobile-card { display: none; }
+.table-hover tbody tr:hover { background-color: #f8f9fa; }
+.pagination-container { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; }
+.page-size-select { width: 100px; }
+.image-preview { max-width: 100px; max-height: 60px; border: 1px solid #ddd; border-radius: 4px; padding: 2px; }
+.form-check-input:checked { background-color: #0d6efd; border-color: #0d6efd; }
+
+@media (max-width: 768px) {
+    .desktop-table { display: none; }
+    .mobile-card { display: block; }
+    .card-item {
+        margin-bottom: 15px;
+        padding: 15px;
+        border: 1px solid #31679e;
+        border-radius: 8px;
+        box-shadow: inset -6px 5px 4px rgba(0, 0, 0, 0.1);
+    }
+    .pagination-container { flex-direction: column; gap: 15px; }
+    .mobile-image-preview { max-width: 80px; margin-top: 10px; }
+}
