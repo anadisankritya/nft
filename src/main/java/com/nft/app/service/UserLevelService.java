@@ -98,6 +98,11 @@ public class UserLevelService {
         userLevel.setImageId(fileId);
         userLevel.setBaseLevel(userLevelRequest.getBaseLevel());
         userLevel.setCheckSum(checkSum);
+        userLevel.setStartPrice(userLevelRequest.getStartPrice());
+        userLevel.setEndPrice(userLevelRequest.getEndPrice());
+        userLevel.setStartProfit(userLevelRequest.getStartProfit());
+        userLevel.setEndProfit(userLevelRequest.getEndProfit());
+        userLevel.setHandlingFees(userLevelRequest.getHandlingFees());
         return userLevel;
     }
 
@@ -109,6 +114,11 @@ public class UserLevelService {
         userLevel.setImageId(fileId);
         userLevel.setBaseLevel(userLevelRequest.getBaseLevel());
         userLevel.setCheckSum(checkSum);
+        userLevel.setStartPrice(userLevelRequest.getStartPrice());
+        userLevel.setEndPrice(userLevelRequest.getEndPrice());
+        userLevel.setStartProfit(userLevelRequest.getStartProfit());
+        userLevel.setEndProfit(userLevelRequest.getEndProfit());
+        userLevel.setHandlingFees(userLevelRequest.getHandlingFees());
         return userLevel;
     }
 
@@ -178,6 +188,11 @@ public class UserLevelService {
                 userLevel.get(),
                 imageData.getFirst()
         );
+    }
+
+    public List<String> getUserLevelByIdIn(List<String> ids) {
+        List<UserLevel> userLevel = userLevelRepository.findByIdIn(ids);
+        return userLevel.stream().map(UserLevel::getName).toList();
     }
 
     public void deleteInvestmentType(String id) {
