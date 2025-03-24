@@ -12,4 +12,9 @@ public class NftException extends RuntimeException {
     this.errorCode = errorCode;
   }
 
+  public NftException(ErrorCode errorCode, Object... args) {
+    super(String.format(errorCode.getDisplayMessage(), args));
+    this.errorCode = errorCode;
+  }
+
 }

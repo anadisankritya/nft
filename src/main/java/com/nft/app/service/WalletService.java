@@ -71,8 +71,8 @@ public class WalletService {
   }
 
   private void validateWithdrawRequest(String email, Integer amount, User user, UserWallet userWallet) {
-    if (amount < 50) {
-      throw new NftException(ErrorCode.MINIMUM_WITHDRAW_ERROR);
+    if (amount < 50 || amount > 999) {
+      throw new NftException(ErrorCode.WITHDRAW_AMOUNT_ERROR, 50, 9999);
     }
 
     if (user.getCreatedDate().isAfter(LocalDateTime.now()
