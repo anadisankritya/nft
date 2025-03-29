@@ -6,8 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.math.BigDecimal;
-
 @Getter
 @Setter
 @NoArgsConstructor
@@ -21,8 +19,8 @@ public class CreateNFTResponse {
     private Double buyPrice;
     private Integer blockPeriod;
     private String category;
-    private String investmentType;
-    private String allowedLevel;
+    private String investmentTypeId;
+    private String userLevelId;
     private Boolean status;
     private String nftCode;
 
@@ -36,8 +34,8 @@ public class CreateNFTResponse {
         this.buyPrice = nftDetails.getBuyPrice();
         this.blockPeriod = nftDetails.getBlockPeriod();
         this.category = nftDetails.getCategory();
-        this.investmentType = nftDetails.getInvestmentType();
-        this.allowedLevel = nftDetails.getAllowedLevel();
+        this.investmentTypeId = nftDetails.getInvestmentType();
+        this.userLevelId = nftDetails.getAllowedLevel();
         this.status = nftDetails.getStatus();
         this.nftCode = nftDetails.getNftCode();
     }

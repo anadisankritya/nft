@@ -139,11 +139,9 @@ public class NFTService {
     public CreateNFTResponse getNFTDetailsById(String id) {
         Optional<NFTDetails> nftDetails = nftRepository.findById(id);
         if (nftDetails.isEmpty())
-            throw new InvestmentTypException(ErrorCode.INVALID_INVESTMENT_TYPE);
+            throw new InvestmentTypException(ErrorCode.INVALID_NFT_DETAILS);
         List<ImageData> imageData = gridFsService.getFileDetailsByIds(List.of(nftDetails.get().getImageId()));
-        if (Objects.nonNull(imageData) && imageData.isEmpty())
-            throw new InvestmentTypException(ErrorCode.INVALID_INVESTMENT_TYPE);
-        return new CreateNFTResponse(nftDetails.get(), imageData.getFirst());
+        return new CreateNFTResponse(nftDetails.get(), Objects.nonNull(imageData)? imageData.getFirst(): null);
     }
 
 
