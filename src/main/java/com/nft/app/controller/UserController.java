@@ -36,7 +36,7 @@ public class UserController {
   public ResponseEntity<NftResponse<UserDetails>> userDetails() {
     String email = getUserEmail();
     UserDetails userDetails = userService.getUserDetails(email);
-    return ResponseEntity.ok(new NftResponse<>("My team list fetched", userDetails));
+    return ResponseEntity.ok(new NftResponse<>("User details fetched", userDetails));
   }
 
   @GetMapping("/api/v1/my-team")
@@ -47,8 +47,7 @@ public class UserController {
   }
 
   private static String getUserEmail() {
-    String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
-    return email;
+    return SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
   }
 
 }
