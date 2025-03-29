@@ -34,16 +34,21 @@ public class UserController {
 
   @GetMapping("/api/v1/my-profile")
   public ResponseEntity<NftResponse<UserDetails>> userDetails() {
-    String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
+    String email = getUserEmail();
     UserDetails userDetails = userService.getUserDetails(email);
     return ResponseEntity.ok(new NftResponse<>("My team list fetched", userDetails));
   }
 
   @GetMapping("/api/v1/my-team")
   public ResponseEntity<NftResponse<UserTeamResponse>> referList() {
-    String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
+    String email = getUserEmail();
     UserTeamResponse userTeamList = userService.getUserTeamList(email);
     return ResponseEntity.ok(new NftResponse<>("My team list fetched", userTeamList));
+  }
+
+  private static String getUserEmail() {
+    String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
+    return email;
   }
 
 }
