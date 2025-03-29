@@ -6,7 +6,6 @@ import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.math.BigDecimal;
 import java.util.Map;
 
 @Getter
@@ -16,16 +15,18 @@ public class TradingDetailsEntity {
     @Id
     private String id;
     private String nftId;
-    private Double profit;
-    private Double buyPrice;
-    private Integer blockPeriod;
+    private Double nftProfit;
+    private Double nftBuyPrice;
+    private Integer nftBlockPeriod;
+    private Double levelHandlingFees;
+    private String levelId;
     private String operation;
     private Long createdAt;
-    private Long createdBy;
+    private String createdBy;
     private Long sellBlockTill;
     private boolean userProfitShared;
     private boolean userProfitBlocked;
     private Map<String, Long> userProfitBreakup;
     private boolean breakupCreated;
-    private TradeStatusEnum tradeStatusEnum;
+    private TradeStatusEnum tradeStatus;
 }
