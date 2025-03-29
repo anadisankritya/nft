@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <div th:fragment="table" class="desktop-table">
+        <div class="card shadow-sm">
+            <div class="card-body p-0 table-overflow">
+                <table class="table table-hover mb-0 table-bordered border-primary">
+                    <thead class="table-primary">
+                        <tr>
+                            <th class="counter-col">#</th> <!-- Static Column for row index -->
+                            <th th:each="column : ${columns}" th:text="${column}"></th> <!-- Dynamic Columns -->
+                            <th class="action-col">Actions</th> <!-- Static Action Column -->
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody" class="bg-white"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

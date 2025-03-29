@@ -4,7 +4,9 @@ import com.nft.app.dto.NftResponse;
 import com.nft.app.dto.request.CreateInvestmentRequest;
 import com.nft.app.dto.request.CreateUserLevelRequest;
 import com.nft.app.dto.request.UpdateUserLevelRequest;
+import com.nft.app.dto.response.CreateInvestmentResponse;
 import com.nft.app.dto.response.CreateUserLevelResponse;
+import com.nft.app.dto.response.PageResponse;
 import com.nft.app.service.UserLevelService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,12 +24,19 @@ public class UserLevelController {
     private UserLevelService userLevelService;
 
     @GetMapping("/list")
-    public ResponseEntity<NftResponse<List<CreateUserLevelResponse>>> getUserLevels(
+    public ResponseEntity<NftResponse<PageResponse<List<CreateUserLevelResponse>>>> getUserLevels(
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new NftResponse<>("User Levels data",
                         userLevelService.getAllUserLevels(page, size)));
+    }
+
+    @GetMapping
+    public ResponseEntity<NftResponse<PageResponse<List<CreateUserLevelResponse>>>> getAllInvestmentTypes() {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new NftResponse<>("User data",
+                        userLevelService.getAllUserLevels(null, null)));
     }
 
     @GetMapping("/{id}")

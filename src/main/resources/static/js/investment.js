@@ -10,24 +10,6 @@ $(document).ready(() => {
     loader.show();
     loadData();
     $('#editModal').on('hidden.bs.modal', resetForm);
-    // Image upload handler
-    document.getElementById('imageInput').addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            currentImageData = {
-                name: file.name,
-                image: event.target.result.split(',')[1],
-                contentType: file.type
-            };
-            document.getElementById('imagePreviewContainer').innerHTML = `
-                <img src="${event.target.result}" class="image-preview" alt="Preview">
-            `;
-        };
-        reader.readAsDataURL(file);
-    });
 });
 
 function populatePageSizeOptions() {
@@ -53,9 +35,7 @@ function changePageSize() {
 
 async function loadData() {
     try {
-        const { data } = await fetchAllNFTUploaded(currentPage - 1, pageSize);
-        const { data: investmentData} = await fetchAllInvestments();
-        console.log(investmentData)
+        const { data } = await fetchInvestments(currentPage - 1, pageSize);
         renderTable(data.data, currentPage, pageSize);
         setupPagination(data.totalCount, pageSize, currentPage);
         loader.hide();
@@ -64,30 +44,48 @@ async function loadData() {
     }
 }
 
-function openCreate() {
-    currentId = null;
-    $('#modalTitle').text('Create NFT Investment');
-    let savedInvestments = fetchAllInvestmentsData();
-    console.log(savedInvestments)
-    resetForm();
+async function openCreate() {
+    const {data} = await fetchAllUserLevels();
+    console.log(data);
+    appendUserLevels(data.data);
+    $('#editModal').modal('show');
 }
 
-function openEdit(id) {
+function appendUserLevels(userLevels) {
+    $('#availableLevels').empty();
+    userLevels.forEach((userLevel, index) => {
+        $('#availableLevels').append(
+            `
+            <div class="form-check form-check-inline" id="availableLevels">
+                <input class="form-check-input" type="checkbox" id="${index}" value="${userLevel.id}">
+                <label class="form-check-label" for="${index}">${userLevel.name}</label>
+            </div>
+            `
+        )
+    });
+}
+
+function appendUserLevelsForEdit(userLevels, allUserLevels) {
+    $('#availableLevels').empty();
+    userLevels.forEach((userLevel, index) => {
+        $('#availableLevels').append(
+            `
+            <div class="form-check form-check-inline" id="availableLevels">
+                <input class="form-check-input" type="checkbox" id="${index}" value="${userLevel.id}" checked>
+                <label class="form-check-label" for="${index}">${userLevel.name}</label>
+            </div>
+            `
+        )
+    });
+}
+
+async function openEdit(id) {
     currentId = id;
     $('#modalTitle').text('Edit NFT Investment');
-    fetchNFTUploadedById(id).then(data => {
+    const {data: allUserLevels} = await fetchAllUserLevels();
+    fetchInvestment(id).then(data => {
         $('#name').val(data.data.name);
-        $('#ownerName').val(data.data.ownerName);
-        $('#buyPrice').val(data.data.buyPrice);
-        $('#profit').val(data.data.profit);
-        $('#investmentType').val(data.data.investmentType);
-        $('#allowedLevel').val(data.data.allowedLevel);
-        $('#status').val(`${data.data.status}`);
-        if (data.data.image?.image) {
-            $('#imagePreviewContainer').attr('src', `data:${data.data.image.contentType};base64,${data.data.image.image}`).show();
-        } else {
-            $('#imagePreviewContainer').hide();
-        }
+        appendUserLevelsForEdit(data.data.allowedLevels, allUserLevels)
         new bootstrap.Modal('#editModal').show();
     }).catch(error => showError('Failed to load investment details', error));
 }
@@ -101,17 +99,15 @@ function resetForm() {
 function saveInvestment() {
     loader.show();
     const payload = {
-        name: $('#name').val(),
-        ownerName: $('#ownerName').val(),
-        buyPrice: parseFloat($('#buyPrice').val()),
-        profit: parseFloat($('#profit').val()),
-        investmentType: $('#investmentType').val(),
-        status: $('#status').val() === 'true',
-        image: currentImageData
+        id: currentId? currentId: null,
+        name: $('#name').val().trim(),
+        levels: $('#availableLevels input[type="checkbox"]:checked')
+                    .map(function() { return $(this).val(); })
+                    .get()
     };
 
     const method = currentId ? 'PUT' : 'POST';
-    createOrUpdateNFTUpload(method, payload)
+    createOrUpdateInvestment(method, payload)
         .then(() => {
             toastr.success('Investment saved successfully');
             $('#editModal').modal('hide');
@@ -150,21 +146,16 @@ function renderTable(items, currentPage, pageSize) {
         const itemNumber = (currentPage - 1) * pageSize + index + 1;
         const imageSrc = item.image?.image ? `data:${item.image.contentType};base64,${item.image.image}` : '';
         // Desktop Row
+        // Generate allowed levels dynamically using .map() and .join('')
+        const allowedLevelsHTML = item.allowedLevels.map(levelItem =>
+            `<span class="fw-semibold">${levelItem.name} </span>`
+        ).join(',');
         tbody.append(`
             <tr>
                 <td class="counter-col">${itemNumber}</td>
                 <td class="fw-semibold">${item.name}</td>
-                <td>${item.ownerName}</td>
-                <td>${item.allowedLevel}</td>
-                <td>${item.investmentType}</td>
-                <td>$${(item.buyPrice || 0).toFixed(2)}</td>
-                <td class="${item.profit >= 0 ? 'text-success' : 'text-danger'}">$${(item.profit || 0).toFixed(2)}</td>
-                <td>${item.blockPeriod}</td>
-                <td>${item.category}</td>
-                <td><span class="badge bg-${item.status ? 'success' : 'danger'}">${item.status ? 'Active' : 'Inactive'}</span></td>
-                <td>${imageSrc ? `<img src="${imageSrc}" class="image-preview">` : 'N/A'}</td>
+                <td class="fw-semibold">${allowedLevelsHTML}</td>
                 <td>
-                    <button class="btn btn-sm btn-outline-primary me-2" onclick="openEdit('${item.id}')"><i class="bi bi-pencil"></i></button>
                     <button class="btn btn-sm btn-outline-danger" onclick="confirmDelete('${item.id}')"><i class="bi bi-trash"></i></button>
                 </td>
             </tr>
@@ -173,53 +164,19 @@ function renderTable(items, currentPage, pageSize) {
         mobile.append(`
             <div class="card-item">
                 <div class="card shadow-sm border-0">
-                    <!-- Image Section -->
-                    <div class="card-img-top p-3">
-                        ${item.image?.image
-                            ? `<img src="data:${item.image.contentType};base64,${item.image.image}" alt="${item.name}" class="img-fluid rounded">`
-                            : `<div class="text-muted small">No Image</div>`}
-                    </div>
-
                     <!-- Details Section -->
                     <div class="card-body p-3">
                         <div class="d-flex flex-column gap-2">
-                            <!-- Name -->
-                            <div class="fw-semibold">${item.name}</div>
-
                             <!-- Item Number -->
                             <div class="text-muted small">#${itemNumber}</div>
 
-                            <!-- Owner Name -->
-                            <div class="text-muted small">Owner: ${item.ownerName}</div>
-
-                            <!-- Buy Price -->
-                            <div class="text-success fw-semibold">Buy Price: $${(item.buyPrice || 0).toFixed(2)}</div>
-
-                            <!-- Profit -->
-                            <div class="${item.profit >= 0 ? 'text-success' : 'text-danger'} fw-semibold">
-                                Profit: $${(item.profit || 0).toFixed(2)}
-                            </div>
-
-                            <!-- Investment Type -->
-                            <div class="text-muted small">Type: ${item.investmentType}</div>
-
-                            <!-- Allowed Levels -->
-                            <div class="text-muted small">Levels: ${item.allowedLevel}</div>
-
-                            <!-- Status -->
-                            <div>
-                                <span class="badge bg-${item.status ? 'success' : 'danger'} small">
-                                    ${item.status ? 'Active' : 'Inactive'}
-                                </span>
-                            </div>
+                            <!-- Name -->
+                            <div class="fw-semibold">${item.name}</div>
                         </div>
                     </div>
 
                     <!-- Actions Section -->
                     <div class="card-footer bg-light d-flex justify-content-between align-items-center py-2">
-                        <button class="btn btn-sm btn-outline-primary" onclick="openEdit('${item.id}')">
-                            <i class="bi bi-pencil"></i> Edit
-                        </button>
                         <button class="btn btn-sm btn-outline-danger" onclick="confirmDelete('${item.id}')">
                             <i class="bi bi-trash"></i> Delete
                         </button>

@@ -5,6 +5,7 @@ import com.nft.app.dto.request.CreateUserLevelRequest;
 import com.nft.app.dto.request.ImageData;
 import com.nft.app.dto.request.UpdateUserLevelRequest;
 import com.nft.app.dto.response.CreateUserLevelResponse;
+import com.nft.app.dto.response.PageResponse;
 import com.nft.app.entity.UserLevel;
 import com.nft.app.enums.SequenceType;
 import com.nft.app.exception.ErrorCode;
@@ -30,18 +31,34 @@ public class UserLevelService {
     private final GridFsService gridFsService;
     private final SequenceGeneratorService sequenceGeneratorService;
 
-    public List<CreateUserLevelResponse> getAllUserLevels(Integer page, Integer size) {
+    public PageResponse<List<CreateUserLevelResponse>> getAllUserLevels(Integer page, Integer size) {
         if (Objects.nonNull(page) && Objects.nonNull(size)) {
             Pageable pageable = PageRequest.of(page, size);
-            Page<UserLevel> investmentTypePage = userLevelRepository.findAll(pageable);
+            Page<UserLevel> userLevels = userLevelRepository.findAll(pageable);
 
-            List<UserLevel> content = investmentTypePage.getContent();
-            List<String> imageIds = content.stream().map(UserLevel::getImageId).toList();
-            List<ImageData> imageData = gridFsService.getFileDetailsByIds(imageIds);
-            Map<String, ImageData> imageDataMap = imageData.stream().collect(Collectors.toMap(ImageData::getImageId, img -> img));
-            return getCreateInvestmentResponses(content, imageDataMap);
+            List<UserLevel> content = userLevels.getContent();
+            Map<String, ImageData> imageDataMap = getImageDataMap(content);
+            List<CreateUserLevelResponse> investmentResponses = getInvestmentResponses(content, imageDataMap);
+            return new PageResponse<>(
+                    userLevels.getTotalElements(),
+                    investmentResponses
+            );
         }
-        return List.of();
+        List<UserLevel> userLevels = userLevelRepository.findAll();
+        Map<String, ImageData> imageDataMap = getImageDataMap(userLevels);
+        return new PageResponse<>((long) userLevels.size(),
+                getInvestmentResponses(userLevels, imageDataMap));
+    }
+
+    private Map<String, ImageData> getImageDataMap(List<UserLevel> content) {
+        List<String> imageIds = content.stream().map(UserLevel::getImageId).toList();
+        List<ImageData> imageData = gridFsService.getFileDetailsByIds(imageIds);
+        Map<String, ImageData> imageDataMap = imageData.stream().collect(Collectors.toMap(ImageData::getImageId, img -> img));
+        return imageDataMap;
+    }
+
+    private static List<CreateUserLevelResponse> getInvestmentResponses(List<UserLevel> content, Map<String, ImageData> imageDataMap) {
+        return getCreateInvestmentResponses(content, imageDataMap);
     }
 
     private static List<CreateUserLevelResponse> getCreateInvestmentResponses(List<UserLevel> userLevels, Map<String, ImageData> imageDataMap) {
@@ -190,9 +207,9 @@ public class UserLevelService {
         );
     }
 
-    public List<String> getUserLevelByIdIn(List<String> ids) {
+    public List<UserLevel> getUserLevelByIdIn(List<String> ids) {
         List<UserLevel> userLevel = userLevelRepository.findByIdIn(ids);
-        return userLevel.stream().map(UserLevel::getName).toList();
+        return userLevel;
     }
 
     public void deleteInvestmentType(String id) {

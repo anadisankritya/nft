@@ -111,7 +111,7 @@
     <!-- Pagination -->
     <div class="pagination-container">
         <div class="d-flex align-items-center gap-2">
-            <span class="text-muted small">Items per page:</span>
+            <span class="text-muted small">page size</span>
             <select class="form-select form-select-sm page-size-select" id="pageSize" onchange="changePageSize()">
                 <option value="5">5</option>
                 <option value="10" selected>10</option>
@@ -218,24 +218,7 @@
         timeOut: 3000
     };
 
-    // Image upload handler
-    document.getElementById('imageInput').addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (!file) return;
 
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            currentImageData = {
-                name: file.name,
-                image: event.target.result.split(',')[1],
-                contentType: file.type
-            };
-            document.getElementById('imagePreviewContainer').innerHTML = `
-                <img src="${event.target.result}" class="image-preview" alt="Preview">
-            `;
-        };
-        reader.readAsDataURL(file);
-    });
 
     $(document).ready(() => loadData());
 

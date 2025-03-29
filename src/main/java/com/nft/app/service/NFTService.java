@@ -4,6 +4,7 @@ import com.mongodb.DuplicateKeyException;
 import com.nft.app.dto.request.CreateNFTRequest;
 import com.nft.app.dto.request.ImageData;
 import com.nft.app.dto.response.CreateNFTResponse;
+import com.nft.app.dto.response.PageResponse;
 import com.nft.app.entity.NFTDetails;
 import com.nft.app.exception.ErrorCode;
 import com.nft.app.exception.InvestmentTypException;
@@ -30,7 +31,7 @@ public class NFTService {
     private final GridFsService gridFsService;
     private final SequenceGeneratorService sequenceGeneratorService;
 
-    public List<CreateNFTResponse> getAllNFTDetails(Integer page, Integer size) {
+    public PageResponse<List<CreateNFTResponse> > getAllNFTDetails(Integer page, Integer size) {
         if (Objects.nonNull(page) && Objects.nonNull(size)) {
             Pageable pageable = PageRequest.of(page, size);
             Page<NFTDetails> investmentTypePage = nftRepository.findAll(pageable);
@@ -39,9 +40,46 @@ public class NFTService {
             List<String> imageIds = content.stream().map(NFTDetails::getImageId).toList();
             List<ImageData> imageData = gridFsService.getFileDetailsByIds(imageIds);
             Map<String, ImageData> imageDataMap = imageData.stream().collect(Collectors.toMap(ImageData::getImageId, img -> img));
-            return getCreateInvestmentResponses(content, imageDataMap);
+            List<CreateNFTResponse> investmentResponses = getInvestmentResponses(content, imageDataMap);
+            return new PageResponse<>(
+                    investmentTypePage.getTotalElements(),
+                    investmentResponses
+            );
         }
-        return List.of();
+        return new PageResponse<>(0L, List.of());
+    }
+
+    public PageResponse<List<CreateNFTResponse> > getAllNFTDetails(String investmentType, String level,
+                                                                   Integer page, Integer size) {
+        if (Objects.nonNull(page) && Objects.nonNull(size)) {
+            Pageable pageable = PageRequest.of(page, size);
+            Page<NFTDetails> investmentTypePage = null;
+            if (Objects.nonNull(investmentType) && Objects.nonNull(level)) {
+                investmentTypePage = nftRepository.findByInvestmentTypeAndAllowedLevel(
+                        investmentType, level, pageable);
+            } else if (Objects.nonNull(investmentType)) {
+                investmentTypePage = nftRepository.findByInvestmentType(
+                        investmentType, pageable);
+            } else if (Objects.nonNull(level)) {
+                investmentTypePage = nftRepository.findByAllowedLevel(level, pageable);
+            } else
+                investmentTypePage = nftRepository.findAll(pageable);
+
+            List<NFTDetails> content = investmentTypePage.getContent();
+            List<String> imageIds = content.stream().map(NFTDetails::getImageId).toList();
+            List<ImageData> imageData = gridFsService.getFileDetailsByIds(imageIds);
+            Map<String, ImageData> imageDataMap = imageData.stream().collect(Collectors.toMap(ImageData::getImageId, img -> img));
+            List<CreateNFTResponse> investmentResponses = getInvestmentResponses(content, imageDataMap);
+            return new PageResponse<>(
+                    investmentTypePage.getTotalElements(),
+                    investmentResponses
+            );
+        }
+        return new PageResponse<>(0L, List.of());
+    }
+
+    private static List<CreateNFTResponse> getInvestmentResponses(List<NFTDetails> content, Map<String, ImageData> imageDataMap) {
+        return getCreateInvestmentResponses(content, imageDataMap);
     }
 
     private static List<CreateNFTResponse> getCreateInvestmentResponses(List<NFTDetails> NFTDetailss, Map<String, ImageData> imageDataMap) {

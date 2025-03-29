@@ -1,70 +1,48 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <style>
-        /* Sticky Footer */
-        html, body {
-            height: 100%;
-            margin: 0;
-        }
-
-        body {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .container-fluid {
-            flex: 1 0 auto; /* Allow the main content to grow and push the footer down */
-        }
-
-        .footer {
-            flex-shrink: 0; /* Prevent the footer from shrinking */
-        }
-    </style>
-</head>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <body>
-<footer class="footer bg-dark text-light py-4">
-    <div class="container">
-        <!-- Footer Content -->
-        <div class="row gy-4">
-            <!-- About Section -->
-            <div class="col-md-4">
-                <h5 class="fw-bold">About Us</h5>
-                <p class="small text-muted">
-                    We are a team dedicated to providing innovative solutions for NFT investments.
-                    Our mission is to empower creators and investors alike.
-                </p>
-            </div>
+    <footer class="footer bg-dark text-light py-4" th:fragment="footer">
+        <div class="container">
+            <!-- Footer Content -->
+            <div class="row gy-4">
+                <!-- About Section -->
+                <div class="col-md-4">
+                    <h5 class="fw-bold">About Us</h5>
+                    <p class="small text-muted">
+                        We are a team dedicated to providing innovative solutions for NFT investments.
+                        Our mission is to empower creators and investors alike.
+                    </p>
+                </div>
 
-            <!-- Quick Links -->
-            <div class="col-md-4">
-                <h5 class="fw-bold">Quick Links</h5>
-                <ul class="list-unstyled small">
-                    <li><a href="#" class="text-light text-decoration-none">Home</a></li>
-                    <li><a href="#" class="text-light text-decoration-none">NFT Investments</a></li>
-                    <li><a href="#" class="text-light text-decoration-none">Dashboard</a></li>
-                    <li><a href="#" class="text-light text-decoration-none">Contact Us</a></li>
-                </ul>
-            </div>
+                <!-- Quick Links -->
+                <div class="col-md-4">
+                    <h5 class="fw-bold">Quick Links</h5>
+                    <ul class="list-unstyled small">
+                        <li><a href="#" class="text-light text-decoration-none">Home</a></li>
+                        <li><a href="#" class="text-light text-decoration-none">NFT Investments</a></li>
+                        <li><a href="#" class="text-light text-decoration-none">Dashboard</a></li>
+                        <li><a href="#" class="text-light text-decoration-none">Contact Us</a></li>
+                    </ul>
+                </div>
 
-            <!-- Social Media -->
-            <div class="col-md-4">
-                <h5 class="fw-bold">Connect With Us</h5>
-                <div class="d-flex gap-3">
-                    <a href="#" class="text-light" aria-label="Facebook"><i class="bi bi-facebook fs-4"></i></a>
-                    <a href="#" class="text-light" aria-label="Twitter"><i class="bi bi-twitter fs-4"></i></a>
-                    <a href="#" class="text-light" aria-label="Instagram"><i class="bi bi-instagram fs-4"></i></a>
-                    <a href="#" class="text-light" aria-label="LinkedIn"><i class="bi bi-linkedin fs-4"></i></a>
+                <!-- Social Media -->
+                <div class="col-md-4">
+                    <h5 class="fw-bold">Connect With Us</h5>
+                    <div class="d-flex gap-3">
+                        <a href="#" class="text-light" aria-label="Facebook"><i class="bi bi-facebook fs-4"></i></a>
+                        <a href="#" class="text-light" aria-label="Twitter"><i class="bi bi-twitter fs-4"></i></a>
+                        <a href="#" class="text-light" aria-label="Instagram"><i class="bi bi-instagram fs-4"></i></a>
+                        <a href="#" class="text-light" aria-label="LinkedIn"><i class="bi bi-linkedin fs-4"></i></a>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Copyright -->
-        <hr class="border-light opacity-25 my-4">
-        <div class="text-center small">
-            &copy; 2023 Your Company Name. All rights reserved.
+            <!-- Copyright -->
+            <hr class="border-light opacity-25 my-4">
+            <div class="text-center small">
+                &copy; 2023 Your Company Name. All rights reserved.
+            </div>
         </div>
-    </div>
-</footer>
+    </footer>
 </body>
 </html>

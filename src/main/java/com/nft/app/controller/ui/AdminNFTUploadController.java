@@ -1,5 +1,6 @@
 package com.nft.app.controller.ui;
 
+import com.nft.app.constant.AppConstants;
 import com.nft.app.service.InvestmentTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -9,14 +10,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 
 @Controller
-@RequestMapping("/ui/nft")
+@RequestMapping("/admin/nft-upload")
 public class AdminNFTUploadController {
 
-    @Autowired
-    private InvestmentTypeService investmentTypeService;
-
-    @GetMapping("/list")
-    public String getAllInvestmentTypes(Model model) {
-        return "/nft/index";
+    @GetMapping("/")
+    public String indexForm(Model model) {
+        model.addAttribute(
+                "columns", AppConstants.NFT_UPLOAD_TABLE_COLUMN
+        );
+        model.addAttribute("pageTitle", "NFT UPLOAD");
+        return "page/nft_upload";
     }
 }
