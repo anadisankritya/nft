@@ -45,7 +45,7 @@ public enum ErrorCode {
   DUPLICATE_USER_LEVEL_IMAGE("130", CONFLICT, "Duplicate image upload for user level"),
   TRANSACTION_ID_ALREADY_PRESENT("131", CONFLICT, "This transaction Id has already been used"),
   INVALID_NFT_DETAILS("132", BAD_REQUEST, "Invalid NFT Id"),
-  DUPLICATE_BUY_ORDER("133",CONFLICT, "Duplicate order request"),
+  DUPLICATE_BUY_ORDER("133", CONFLICT, "Duplicate order request"),
   INVALID_USER_LEVEL("134", BAD_REQUEST, "User Level is not allowed to buy selected nft");
 
   private final String code;

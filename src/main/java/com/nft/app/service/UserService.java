@@ -81,7 +81,7 @@ public class UserService {
 
   }
 
-//  @Transactional
+  //  @Transactional
   @Retryable(retryFor = UserCodeException.class)
   public void registerUser(UserRequest userRequest) {
     log.info("inside UserService::registerUser for email - {}", userRequest.email());
@@ -120,7 +120,8 @@ public class UserService {
       if (!StringUtils.hasText(user.getReferralCode())) {
         throw new NftException(ErrorCode.REFERRAL_CODE_MANDATORY);
       }
-      if (!existsByUserCode) {
+      boolean existsByReferralCode = userRepository.existsByUserCode(user.getReferralCode());
+      if (!existsByReferralCode) {
         throw new NftException(ErrorCode.INVALID_REFERRAL_CODE);
       }
     }
