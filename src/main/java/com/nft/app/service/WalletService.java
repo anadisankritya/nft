@@ -56,7 +56,7 @@ public class WalletService {
     log.info("inside WalletService::withdrawFund for email - {}, amount - {}", email, amount);
     User user = userService.getUser(email);
 
-    UserWallet userWallet = userWalletRepository.findByEmail(email);
+    UserWallet userWallet = getUserWallet(email);
     validateWithdrawRequest(email, amount, user, userWallet);
 
     Integer currentBalance = userWallet.getBalance();
@@ -142,9 +142,13 @@ public class WalletService {
   }
 
   private void depositFunds(String email, Integer amount) {
-    UserWallet userWallet = userWalletRepository.findByEmail(email);
+    UserWallet userWallet = getUserWallet(email);
     userWallet.setBalance(userWallet.getBalance() + amount);
     userWalletRepository.save(userWallet);
+  }
+
+  UserWallet getUserWallet(String email) {
+    return userWalletRepository.findByEmail(email);
   }
 
   private void updateDepositRequest(String status, String comment, DepositRequest depositRequest) {
