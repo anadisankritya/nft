@@ -5,7 +5,6 @@ import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
@@ -23,8 +22,8 @@ public class NFTDetails {
     private Double buyPrice;
     private Integer blockPeriod;
     private String category;
-    private String InvestmentType;
-    private String allowedLevel;
+    private String investmentTypeId;
+    private String levelId;
     private Boolean status;
     private LocalDateTime createdAt;
 }

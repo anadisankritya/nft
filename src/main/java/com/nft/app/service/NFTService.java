@@ -55,13 +55,13 @@ public class NFTService {
             Pageable pageable = PageRequest.of(page, size);
             Page<NFTDetails> investmentTypePage = null;
             if (Objects.nonNull(investmentType) && Objects.nonNull(level)) {
-                investmentTypePage = nftRepository.findByInvestmentTypeAndAllowedLevel(
+                investmentTypePage = nftRepository.findByInvestmentTypeIdAndLevelId(
                         investmentType, level, pageable);
             } else if (Objects.nonNull(investmentType)) {
-                investmentTypePage = nftRepository.findByInvestmentType(
+                investmentTypePage = nftRepository.findByInvestmentTypeId(
                         investmentType, pageable);
             } else if (Objects.nonNull(level)) {
-                investmentTypePage = nftRepository.findByAllowedLevel(level, pageable);
+                investmentTypePage = nftRepository.findByLevelId(level, pageable);
             } else
                 investmentTypePage = nftRepository.findAll(pageable);
 
@@ -113,18 +113,19 @@ public class NFTService {
             String fileId = gridFsService.uploadFile(multipartFileVo);
             NFTDetails nftDetails = new NFTDetails();
             nftDetails.setName(NFTDetailsRequest.getName());
-            nftDetails.setNftCode(InvestmentIdGenerator.generateInvestmentId(NFTDetailsRequest.getInvestmentType()));
+            nftDetails.setNftCode(InvestmentIdGenerator.generateInvestmentId(NFTDetailsRequest.getInvestmentTypeId()));
             nftDetails.setCategory(NFTDetailsRequest.getCategory());
             nftDetails.setBuyPrice(NFTDetailsRequest.getBuyPrice());
             nftDetails.setProfit(NFTDetailsRequest.getProfit());
             nftDetails.setStatus(NFTDetailsRequest.getStatus());
             nftDetails.setBlockPeriod(NFTDetailsRequest.getBlockPeriod());
-            nftDetails.setInvestmentType(NFTDetailsRequest.getInvestmentType());
-            nftDetails.setAllowedLevel(NFTDetailsRequest.getAllowedLevel());
+            nftDetails.setInvestmentTypeId(NFTDetailsRequest.getInvestmentTypeId());
+            nftDetails.setLevelId(NFTDetailsRequest.getLevelId());
             nftDetails.setOwnerName(NFTDetailsRequest.getOwnerName());
             nftDetails.setImageId(fileId);
             nftDetails.setCheckSum(checkSum);
             nftDetails.setCreatedAt(LocalDateTime.now());
+            nftDetails.setStatus(NFTDetailsRequest.getStatus());
             nftRepository.save(nftDetails);
         } catch (NftException e) {
           throw e;

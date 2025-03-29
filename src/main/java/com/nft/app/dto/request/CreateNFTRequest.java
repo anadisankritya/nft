@@ -17,7 +17,7 @@ public class CreateNFTRequest {
     private Double buyPrice;
     private Integer blockPeriod; // days
     private String category;
-    private String investmentType;
-    private String allowedLevel;
+    private String investmentTypeId;
+    private String levelId;
     private Boolean status;
 }

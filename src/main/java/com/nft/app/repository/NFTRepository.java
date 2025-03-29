@@ -18,7 +18,7 @@ public interface NFTRepository extends MongoRepository<NFTDetails, String> {
 
     List<NFTDetails> findByIdIn(List<String> ids);
 
-    Page<NFTDetails> findByInvestmentType(String investmentType, Pageable pageable);
-    Page<NFTDetails> findByAllowedLevel(String level, Pageable pageable);
-    Page<NFTDetails> findByInvestmentTypeAndAllowedLevel(String investmentType, String level, Pageable pageable);
+    Page<NFTDetails> findByInvestmentTypeId(String investmentType, Pageable pageable);
+    Page<NFTDetails> findByLevelId(String level, Pageable pageable);
+    Page<NFTDetails> findByInvestmentTypeIdAndLevelId(String investmentType, String level, Pageable pageable);
 }
