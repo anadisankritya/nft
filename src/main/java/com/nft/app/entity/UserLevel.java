@@ -6,10 +6,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 @Getter
 @Setter
@@ -27,4 +24,5 @@ public class UserLevel {
     private Integer startProfit;
     private Integer endProfit;
     private BigDecimal handlingFees;
+    private List<String> rules;
 }

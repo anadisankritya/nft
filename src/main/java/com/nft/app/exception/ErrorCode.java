@@ -34,7 +34,7 @@ public enum ErrorCode {
   INVALID_INVESTMENT_TYPE("119", NOT_FOUND, "Invalid investment type id"),
   UPDATE_INVESTMENT_FAILED("120", BAD_REQUEST, "Update investment type failed."),
   WALLET_NOT_FOUND("121", INTERNAL_SERVER_ERROR, "Wallet linked to user not found"),
-  MINIMUM_WITHDRAW_ERROR("122", BAD_REQUEST, "Minimum withdraw amount should be 50"),
+  WITHDRAW_AMOUNT_ERROR("122", BAD_REQUEST, "Withdrawal amount should be between %s to %s"),
   NEW_USER_WITHDRAW("123", BAD_REQUEST, "Cannot withdraw until 7 days of registration"),
   PENDING_WITHDRAW_REQUEST("124", BAD_REQUEST, "Previous withdraw request is already pending"),
   INSUFFICIENT_FUNDS("125", BAD_REQUEST, "Insufficient wallet amount"),

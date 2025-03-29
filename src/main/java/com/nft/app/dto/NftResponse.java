@@ -36,4 +36,5 @@ public record NftResponse<T>(
     this(errorCode.getCode(), errorCode.name(), exception.getMessage(), null);
   }
 
+
 }
