@@ -19,187 +19,203 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class UserLevelService {
 
-    private final UserLevelRepository userLevelRepository;
-    private final GridFsService gridFsService;
-    private final SequenceGeneratorService sequenceGeneratorService;
+  private final UserLevelRepository userLevelRepository;
+  private final GridFsService gridFsService;
+  private final SequenceGeneratorService sequenceGeneratorService;
 
-    public List<CreateUserLevelResponse> getAllUserLevels(Integer page, Integer size) {
-        if (Objects.nonNull(page) && Objects.nonNull(size)) {
-            Pageable pageable = PageRequest.of(page, size);
-            Page<UserLevel> investmentTypePage = userLevelRepository.findAll(pageable);
+  public List<CreateUserLevelResponse> getAllUserLevels(Integer page, Integer size) {
+    if (Objects.nonNull(page) && Objects.nonNull(size)) {
+      Pageable pageable = PageRequest.of(page, size);
+      Page<UserLevel> investmentTypePage = userLevelRepository.findAll(pageable);
 
-            List<UserLevel> content = investmentTypePage.getContent();
-            List<String> imageIds = content.stream().map(UserLevel::getImageId).toList();
-            List<ImageData> imageData = gridFsService.getFileDetailsByIds(imageIds);
-            Map<String, ImageData> imageDataMap = imageData.stream().collect(Collectors.toMap(ImageData::getImageId, img -> img));
-            return getCreateInvestmentResponses(content, imageDataMap);
-        }
-        return List.of();
+      List<UserLevel> content = investmentTypePage.getContent();
+      List<String> imageIds = content.stream().map(UserLevel::getImageId).toList();
+      List<ImageData> imageData = gridFsService.getFileDetailsByIds(imageIds);
+      Map<String, ImageData> imageDataMap = imageData.stream().collect(Collectors.toMap(ImageData::getImageId, img -> img));
+      return getCreateInvestmentResponses(content, imageDataMap);
+    }
+    return List.of();
+  }
+
+  private static List<CreateUserLevelResponse> getCreateInvestmentResponses(List<UserLevel> userLevels, Map<String, ImageData> imageDataMap) {
+
+    List<CreateUserLevelResponse> userLevelResponses = new ArrayList<>();
+
+    for (UserLevel userLevel : userLevels) {
+      userLevelResponses.add(
+          new CreateUserLevelResponse(
+              userLevel, imageDataMap.get(userLevel.getImageId())
+          )
+      );
+    }
+    return userLevelResponses;
+  }
+
+  public void createUserLevel(CreateUserLevelRequest userLevelRequest) {
+
+    Optional<UserLevel> userLevel = userLevelRepository.findByName(
+        userLevelRequest.getName().toUpperCase(Locale.ROOT)
+    );
+    if (userLevel.isPresent())
+      throw new InvestmentTypException(ErrorCode.DUPLICATE_USER_LEVEL);
+
+    try {
+      Base64MultipartFileVo multipartFileVo = new Base64MultipartFileVo(
+          userLevelRequest.getImage().getImage(),
+          userLevelRequest.getImage().getName(),
+          userLevelRequest.getImage().getContentType());
+
+      String checkSum = ChecksumUtil.getCheckSum(multipartFileVo.getBytes());
+
+      Optional<UserLevel> userLevelCheckSum = userLevelRepository.findByCheckSum(checkSum);
+      if (userLevelCheckSum.isPresent())
+        throw new UserLevelException(ErrorCode.DUPLICATE_USER_LEVEL_IMAGE);
+      String fileId = gridFsService.uploadFile(multipartFileVo);
+      Long seqNo = sequenceGeneratorService.generateSequence(SequenceType.USER_LEVEL.name());
+      UserLevel investmentTypeEntity = getUserLevel(userLevelRequest, seqNo, fileId, checkSum);
+      userLevelRepository.save(investmentTypeEntity);
+    } catch (UserLevelException e) {
+      throw e;
+    } catch (DuplicateKeyException e) {
+      throw new InvestmentTypException(ErrorCode.DUPLICATE_USER_LEVEL);
+    } catch (Exception e) {
+      throw new InvestmentTypException(ErrorCode.CREATE_USER_LEVEL_FAILED);
+    }
+  }
+
+  private static UserLevel getUserLevel(CreateUserLevelRequest userLevelRequest, Long seqNo,
+                                        String fileId, String checkSum) {
+    UserLevel userLevel = new UserLevel();
+    userLevel.setSeq(seqNo);
+    userLevel.setName(userLevelRequest.getName().toUpperCase(Locale.ROOT));
+    userLevel.setImageId(fileId);
+    userLevel.setBaseLevel(userLevelRequest.getBaseLevel());
+    userLevel.setCheckSum(checkSum);
+    userLevel.setStartPrice(userLevelRequest.getStartPrice());
+    userLevel.setEndPrice(userLevelRequest.getEndPrice());
+    userLevel.setStartProfit(userLevelRequest.getStartProfit());
+    userLevel.setEndProfit(userLevelRequest.getEndProfit());
+    userLevel.setHandlingFees(userLevelRequest.getHandlingFees());
+    return userLevel;
+  }
+
+  private static UserLevel getUserLevel(UpdateUserLevelRequest userLevelRequest, Long seqNo,
+                                        String fileId, String checkSum) {
+    UserLevel userLevel = new UserLevel();
+    userLevel.setSeq(seqNo);
+    userLevel.setName(userLevelRequest.getName().toUpperCase(Locale.ROOT));
+    userLevel.setImageId(fileId);
+    userLevel.setBaseLevel(userLevelRequest.getBaseLevel());
+    userLevel.setCheckSum(checkSum);
+    userLevel.setStartPrice(userLevelRequest.getStartPrice());
+    userLevel.setEndPrice(userLevelRequest.getEndPrice());
+    userLevel.setStartProfit(userLevelRequest.getStartProfit());
+    userLevel.setEndProfit(userLevelRequest.getEndProfit());
+    userLevel.setHandlingFees(userLevelRequest.getHandlingFees());
+    return userLevel;
+  }
+
+  public void updateUserLevel(UpdateUserLevelRequest userLevelRequest) {
+
+    Optional<UserLevel> userLevelId = userLevelRepository.findById(userLevelRequest.getId());
+
+    if (userLevelId.isEmpty())
+      throw new UserLevelException(ErrorCode.USER_LEVEL_NOT_FOUND);
+
+    Optional<UserLevel> userLevelName = userLevelRepository.findByName(
+        userLevelRequest.getName()
+    );
+    if (userLevelName.isPresent())
+      if (!userLevelName.get().getId().equals(userLevelId.get().getId()))
+        throw new InvestmentTypException(ErrorCode.DUPLICATE_USER_LEVEL);
+
+    boolean isDifferentFile = Boolean.TRUE;
+    String checkSum = null;
+    Base64MultipartFileVo multipartFileVo = null;
+    if (Objects.nonNull(userLevelRequest.getImage())) {
+      multipartFileVo = new Base64MultipartFileVo(
+          userLevelRequest.getImage().getImage(),
+          userLevelRequest.getImage().getName(),
+          userLevelRequest.getImage().getContentType());
+
+      checkSum = ChecksumUtil.getCheckSum(multipartFileVo.getBytes());
+
+      Optional<UserLevel> userLevelCheckSum = userLevelRepository.findByCheckSum(checkSum);
+      if (userLevelCheckSum.isPresent()) {
+        if (!userLevelCheckSum.get().getId().equals(userLevelId.get().getId()))
+          throw new UserLevelException(ErrorCode.DUPLICATE_USER_LEVEL_IMAGE);
+        else
+          isDifferentFile = Boolean.FALSE;
+      }
+    } else {
+      isDifferentFile = Boolean.FALSE;
+      checkSum = userLevelId.get().getCheckSum();
     }
 
-    private static List<CreateUserLevelResponse> getCreateInvestmentResponses(List<UserLevel> userLevels, Map<String, ImageData> imageDataMap) {
+    try {
+      String fileId;
+      if (isDifferentFile)
+        fileId = gridFsService.uploadFile(multipartFileVo);
+      else
+        fileId = userLevelId.get().getImageId();
 
-        List<CreateUserLevelResponse> userLevelResponses = new ArrayList<>();
-
-        for (UserLevel userLevel : userLevels) {
-            userLevelResponses.add(
-                    new CreateUserLevelResponse(
-                            userLevel, imageDataMap.get(userLevel.getImageId())
-                    )
-            );
-        }
-        return userLevelResponses;
+      UserLevel investmentTypeEntity = getUserLevel(userLevelRequest,
+          userLevelId.get().getSeq(), fileId, checkSum);
+      investmentTypeEntity.setId(userLevelId.get().getId());
+      userLevelRepository.save(investmentTypeEntity);
+    } catch (DuplicateKeyException | org.springframework.dao.DuplicateKeyException e) {
+      throw new InvestmentTypException(ErrorCode.DUPLICATE_USER_LEVEL);
+    } catch (Exception e) {
+      throw new InvestmentTypException(ErrorCode.CREATE_USER_LEVEL_FAILED);
     }
+  }
 
-    public void createUserLevel(CreateUserLevelRequest userLevelRequest) {
+  public CreateUserLevelResponse getUserLevelById(String id) {
+    Optional<UserLevel> userLevel = userLevelRepository.findById(id);
+    if (userLevel.isEmpty())
+      throw new InvestmentTypException(ErrorCode.INVALID_INVESTMENT_TYPE);
+    List<ImageData> imageData = gridFsService.getFileDetailsByIds(List.of(userLevel.get().getImageId()));
+    if (Objects.nonNull(imageData) && imageData.isEmpty())
+      throw new InvestmentTypException(ErrorCode.INVALID_INVESTMENT_TYPE);
+    return new CreateUserLevelResponse(
+        userLevel.get(),
+        imageData.getFirst()
+    );
+  }
 
-        Optional<UserLevel> userLevel = userLevelRepository.findByName(
-                userLevelRequest.getName().toUpperCase(Locale.ROOT)
-        );
-        if (userLevel.isPresent())
-            throw new InvestmentTypException(ErrorCode.DUPLICATE_USER_LEVEL);
+  public List<String> getUserLevelByIdIn(List<String> ids) {
+    List<UserLevel> userLevel = userLevelRepository.findByIdIn(ids);
+    return userLevel.stream().map(UserLevel::getName).toList();
+  }
 
-        try {
-            Base64MultipartFileVo multipartFileVo = new Base64MultipartFileVo(
-                    userLevelRequest.getImage().getImage(),
-                    userLevelRequest.getImage().getName(),
-                    userLevelRequest.getImage().getContentType());
+  public void deleteInvestmentType(String id) {
+    Optional<UserLevel> userLevel = userLevelRepository.findById(id);
+    if (userLevel.isEmpty())
+      throw new UserLevelException(ErrorCode.USER_LEVEL_NOT_FOUND);
+    gridFsService.deleteFile(userLevel.get().getImageId());
+    userLevelRepository.deleteById(id);
+  }
 
-            String checkSum = ChecksumUtil.getCheckSum(multipartFileVo.getBytes());
+  public void addUserLevelRules(String id, List<String> rules) {
+    UserLevel userLevel = getUserLevel(id);
+    userLevel.setRules(rules);
+    userLevelRepository.save(userLevel);
+  }
 
-            Optional<UserLevel> userLevelCheckSum = userLevelRepository.findByCheckSum(checkSum);
-            if (userLevelCheckSum.isPresent())
-                throw new UserLevelException(ErrorCode.DUPLICATE_USER_LEVEL_IMAGE);
-            String fileId = gridFsService.uploadFile(multipartFileVo);
-            Long seqNo = sequenceGeneratorService.generateSequence(SequenceType.USER_LEVEL.name());
-            UserLevel investmentTypeEntity = getUserLevel(userLevelRequest, seqNo, fileId, checkSum);
-            userLevelRepository.save(investmentTypeEntity);
-        } catch (UserLevelException e) {
-          throw e;
-        } catch (DuplicateKeyException e) {
-            throw new InvestmentTypException(ErrorCode.DUPLICATE_USER_LEVEL);
-        } catch (Exception e) {
-            throw new InvestmentTypException(ErrorCode.CREATE_USER_LEVEL_FAILED);
-        }
-    }
-
-    private static UserLevel getUserLevel(CreateUserLevelRequest userLevelRequest, Long seqNo,
-                                          String fileId, String checkSum) {
-        UserLevel userLevel = new UserLevel();
-        userLevel.setSeq(seqNo);
-        userLevel.setName(userLevelRequest.getName().toUpperCase(Locale.ROOT));
-        userLevel.setImageId(fileId);
-        userLevel.setBaseLevel(userLevelRequest.getBaseLevel());
-        userLevel.setCheckSum(checkSum);
-        userLevel.setStartPrice(userLevelRequest.getStartPrice());
-        userLevel.setEndPrice(userLevelRequest.getEndPrice());
-        userLevel.setStartProfit(userLevelRequest.getStartProfit());
-        userLevel.setEndProfit(userLevelRequest.getEndProfit());
-        userLevel.setHandlingFees(userLevelRequest.getHandlingFees());
-        return userLevel;
-    }
-
-    private static UserLevel getUserLevel(UpdateUserLevelRequest userLevelRequest, Long seqNo,
-                                          String fileId, String checkSum) {
-        UserLevel userLevel = new UserLevel();
-        userLevel.setSeq(seqNo);
-        userLevel.setName(userLevelRequest.getName().toUpperCase(Locale.ROOT));
-        userLevel.setImageId(fileId);
-        userLevel.setBaseLevel(userLevelRequest.getBaseLevel());
-        userLevel.setCheckSum(checkSum);
-        userLevel.setStartPrice(userLevelRequest.getStartPrice());
-        userLevel.setEndPrice(userLevelRequest.getEndPrice());
-        userLevel.setStartProfit(userLevelRequest.getStartProfit());
-        userLevel.setEndProfit(userLevelRequest.getEndProfit());
-        userLevel.setHandlingFees(userLevelRequest.getHandlingFees());
-        return userLevel;
-    }
-
-    public void updateUserLevel(UpdateUserLevelRequest userLevelRequest) {
-
-        Optional<UserLevel> userLevelId = userLevelRepository.findById(userLevelRequest.getId());
-
-        if (userLevelId.isEmpty())
-            throw new UserLevelException(ErrorCode.USER_LEVEL_NOT_FOUND);
-
-        Optional<UserLevel> userLevelName = userLevelRepository.findByName(
-                userLevelRequest.getName()
-        );
-        if (userLevelName.isPresent())
-            if (!userLevelName.get().getId().equals(userLevelId.get().getId()))
-                throw new InvestmentTypException(ErrorCode.DUPLICATE_USER_LEVEL);
-
-        boolean isDifferentFile = Boolean.TRUE;
-        String checkSum = null;
-        Base64MultipartFileVo multipartFileVo = null;
-        if (Objects.nonNull(userLevelRequest.getImage())) {
-             multipartFileVo = new Base64MultipartFileVo(
-                    userLevelRequest.getImage().getImage(),
-                    userLevelRequest.getImage().getName(),
-                    userLevelRequest.getImage().getContentType());
-
-             checkSum = ChecksumUtil.getCheckSum(multipartFileVo.getBytes());
-
-            Optional<UserLevel> userLevelCheckSum = userLevelRepository.findByCheckSum(checkSum);
-            if (userLevelCheckSum.isPresent()) {
-                if (!userLevelCheckSum.get().getId().equals(userLevelId.get().getId()))
-                    throw new UserLevelException(ErrorCode.DUPLICATE_USER_LEVEL_IMAGE);
-                else
-                    isDifferentFile = Boolean.FALSE;
-            }
-        } else {
-            isDifferentFile = Boolean.FALSE;
-            checkSum = userLevelId.get().getCheckSum();
-        }
-
-        try {
-            String fileId;
-            if (isDifferentFile)
-                fileId = gridFsService.uploadFile(multipartFileVo);
-            else
-                fileId = userLevelId.get().getImageId();
-
-            UserLevel investmentTypeEntity = getUserLevel(userLevelRequest,
-                    userLevelId.get().getSeq(), fileId, checkSum);
-            investmentTypeEntity.setId(userLevelId.get().getId());
-            userLevelRepository.save(investmentTypeEntity);
-        } catch (DuplicateKeyException | org.springframework.dao.DuplicateKeyException e) {
-            throw new InvestmentTypException(ErrorCode.DUPLICATE_USER_LEVEL);
-        } catch (Exception e) {
-            throw new InvestmentTypException(ErrorCode.CREATE_USER_LEVEL_FAILED);
-        }
-    }
-
-    public CreateUserLevelResponse getUserLevelById(String id) {
-        Optional<UserLevel> userLevel = userLevelRepository.findById(id);
-        if (userLevel.isEmpty())
-            throw new InvestmentTypException(ErrorCode.INVALID_INVESTMENT_TYPE);
-        List<ImageData> imageData = gridFsService.getFileDetailsByIds(List.of(userLevel.get().getImageId()));
-        if (Objects.nonNull(imageData) && imageData.isEmpty())
-            throw new InvestmentTypException(ErrorCode.INVALID_INVESTMENT_TYPE);
-        return new CreateUserLevelResponse(
-                userLevel.get(),
-                imageData.getFirst()
-        );
-    }
-
-    public List<String> getUserLevelByIdIn(List<String> ids) {
-        List<UserLevel> userLevel = userLevelRepository.findByIdIn(ids);
-        return userLevel.stream().map(UserLevel::getName).toList();
-    }
-
-    public void deleteInvestmentType(String id) {
-        Optional<UserLevel> userLevel = userLevelRepository.findById(id);
-        if (userLevel.isEmpty())
-            throw new UserLevelException(ErrorCode.USER_LEVEL_NOT_FOUND);
-        gridFsService.deleteFile(userLevel.get().getImageId());
-        userLevelRepository.deleteById(id);
-    }
+  private UserLevel getUserLevel(String id) {
+    return userLevelRepository.findById(id)
+        .orElseThrow(() -> new UserLevelException(ErrorCode.USER_LEVEL_NOT_FOUND));
+  }
 }
