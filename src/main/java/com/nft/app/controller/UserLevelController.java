@@ -3,7 +3,9 @@ package com.nft.app.controller;
 import com.nft.app.dto.NftResponse;
 import com.nft.app.dto.request.CreateUserLevelRequest;
 import com.nft.app.dto.request.UpdateUserLevelRequest;
+import com.nft.app.dto.response.CreateInvestmentResponse;
 import com.nft.app.dto.response.CreateUserLevelResponse;
+import com.nft.app.dto.response.PageResponse;
 import com.nft.app.service.UserLevelService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,21 +31,29 @@ public class UserLevelController {
   @Autowired
   private UserLevelService userLevelService;
 
-  @GetMapping("/list")
-  public ResponseEntity<NftResponse<List<CreateUserLevelResponse>>> getUserLevels(
-      @RequestParam(required = false) Integer page,
-      @RequestParam(required = false) Integer size) {
-    return ResponseEntity.status(HttpStatus.OK)
-        .body(new NftResponse<>("User Levels data",
-            userLevelService.getAllUserLevels(page, size)));
-  }
+  
+    @GetMapping("/list")
+    public ResponseEntity<NftResponse<PageResponse<List<CreateUserLevelResponse>>>> getUserLevels(
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new NftResponse<>("User Levels data",
+                        userLevelService.getAllUserLevels(page, size)));
+    }
 
-  @GetMapping("/{id}")
-  public ResponseEntity<NftResponse<CreateUserLevelResponse>> getUserLevel(@PathVariable String id) {
-    return ResponseEntity.status(HttpStatus.OK)
-        .body(new NftResponse<>("Investment data",
-            userLevelService.getUserLevelById(id)));
-  }
+    @GetMapping
+    public ResponseEntity<NftResponse<PageResponse<List<CreateUserLevelResponse>>>> getAllInvestmentTypes() {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new NftResponse<>("User data",
+                        userLevelService.getAllUserLevels(null, null)));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<NftResponse<CreateUserLevelResponse>> getUserLevel(@PathVariable String id) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new NftResponse<>("Investment data",
+                        userLevelService.getUserLevelById(id)));
+    }
 
   @PostMapping("/create")
   public ResponseEntity<NftResponse<String>> createUserLevel(

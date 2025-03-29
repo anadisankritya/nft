@@ -1,5 +1,6 @@
 package com.nft.app.controller.ui;
 
+import com.nft.app.constant.AppConstants;
 import com.nft.app.service.InvestmentTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -9,14 +10,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 
 @Controller
-@RequestMapping("/ui/investment-types")
+@RequestMapping("/admin/investment-types")
 public class AdminInvestmentTypeController {
 
-    @Autowired
-    private InvestmentTypeService investmentTypeService;
-
-    @GetMapping("/list")
-    public String getAllInvestmentTypes(Model model) {
-        return "InvestmentTypeCRUD";
+    @GetMapping("/")
+    public String indexPage(Model model) {
+        model.addAttribute(
+                "columns", AppConstants.INVESTMENT_TYPE_TABLE_COLUMN
+        );
+        model.addAttribute("pageTitle", "Investment Types");
+        return "page/investment_types";
     }
 }

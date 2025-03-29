@@ -3,6 +3,7 @@ package com.nft.app.controller;
 import com.nft.app.dto.NftResponse;
 import com.nft.app.dto.request.CreateInvestmentRequest;
 import com.nft.app.dto.response.CreateInvestmentResponse;
+import com.nft.app.dto.response.PageResponse;
 import com.nft.app.service.InvestmentTypeService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,12 +21,19 @@ public class InvestmentTypeController {
     private InvestmentTypeService investmentTypeService;
 
     @GetMapping("/list")
-    public ResponseEntity<NftResponse<List<CreateInvestmentResponse>>> getInvestmentTypes(
+    public ResponseEntity<NftResponse<PageResponse<List<CreateInvestmentResponse>>>> getInvestmentTypes(
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new NftResponse<>("Investment data",
                         investmentTypeService.getAllInvestmentTypes(page, size)));
+    }
+
+    @GetMapping
+    public ResponseEntity<NftResponse<PageResponse<List<CreateInvestmentResponse>>>> getAllInvestmentTypes() {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new NftResponse<>("Investment data",
+                        investmentTypeService.getAllInvestmentTypes(null, null)));
     }
 
     @GetMapping("/{id}")
