@@ -208,8 +208,7 @@ public class UserLevelService {
     }
 
     public List<UserLevel> getUserLevelByIdIn(List<String> ids) {
-        List<UserLevel> userLevel = userLevelRepository.findByIdIn(ids);
-        return userLevel;
+        return userLevelRepository.findByIdIn(ids);
     }
 
     public void deleteInvestmentType(String id) {

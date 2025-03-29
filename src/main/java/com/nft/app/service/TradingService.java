@@ -15,6 +15,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -29,6 +30,7 @@ public class TradingService {
     private final UserLevelService userLevelService;
     private final WalletService walletService;
 
+    @Transactional(rollbackFor = Exception.class)
     public void createBuyOrder(BuyOrderDto buyOrderDto, String email) {
         UserDetails userDetails = userService.getUserDetails(email);
         CreateNFTResponse nftDetails = nftService.getNFTDetailsById(buyOrderDto.getNftId());
@@ -38,8 +40,9 @@ public class TradingService {
             throw new TradingException(ErrorCode.DUPLICATE_BUY_ORDER);
         }
         String userLevelId = nftDetails.getUserLevelId();
-        CreateUserLevelResponse userLevelResponse =  userLevelService.getUserLevelById(userLevelId);
-        if (userDetails.getLevel() > userLevelResponse.getSeq())
+        CreateUserLevelResponse nftUserLevelResponse =  userLevelService.getUserLevelById(userLevelId);
+        CreateUserLevelResponse loginUserLevelResponse =  userLevelService.getUserLevelById(userDetails.getLevel());
+        if (nftUserLevelResponse.getSeq() > loginUserLevelResponse.getSeq())
             throw new TradingException(ErrorCode.INVALID_USER_LEVEL);
 
         UserDetails.WalletDetails walletDetails = userDetails.getWalletDetails();
@@ -54,7 +57,7 @@ public class TradingService {
         tradingDetailsEntity.setNftBuyPrice(nftDetails.getBuyPrice());
         tradingDetailsEntity.setNftProfit(nftDetails.getProfit());
         tradingDetailsEntity.setNftBlockPeriod(nftDetails.getBlockPeriod());
-        tradingDetailsEntity.setLevelHandlingFees();
+        tradingDetailsEntity.setLevelHandlingFees(nftUserLevelResponse.getHandlingFees());
         tradingDetailsEntity.setNftId(nftDetails.getId());
         tradingDetailsEntity.setTradeStatus(TradeStatusEnum.IN_PROGRESS);
         Long blockPeriod = System.currentTimeMillis() + TimeUtil.convertDaysToMilliseconds(
@@ -63,11 +66,18 @@ public class TradingService {
         tradingDetailsEntity.setSellBlockTill(blockPeriod);
         tradingDetailsEntity.setOperation("BUY");
         tradingDetailsEntity.setBreakupCreated(Boolean.FALSE);
-        tradingDetailsEntity.setBreakupCreated(Boolean.FALSE);
         tradingDetailsEntity.setUserProfitShared(Boolean.FALSE);
-        tradingDetailsRepository.save(tradingDetailsEntity);
-        walletService.updateWallet(
-                email, Integer.valueOf(String.valueOf(nftDetails.getBuyPrice()))
-        );
+        tradingDetailsEntity.setUserProfitBlocked(Boolean.TRUE);
+
+        try {
+            tradingDetailsRepository.save(tradingDetailsEntity);
+            walletService.updateWallet(
+                    email, Integer.valueOf(String.valueOf(nftDetails.getBuyPrice()))
+            );
+        } catch (DuplicateKeyException e) {
+            throw new TradingException(ErrorCode.DUPLICATE_BUY_ORDER);
+        } catch (Exception e) {
+            throw new TradingException(ErrorCode.GENERIC_EXCEPTION);
+        }
     }
 }

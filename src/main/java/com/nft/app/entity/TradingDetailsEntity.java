@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 @Getter
@@ -18,7 +19,7 @@ public class TradingDetailsEntity {
     private Double nftProfit;
     private Double nftBuyPrice;
     private Integer nftBlockPeriod;
-    private Double levelHandlingFees;
+    private BigDecimal levelHandlingFees;
     private String levelId;
     private String operation;
     private Long createdAt;
