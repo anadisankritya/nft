@@ -59,9 +59,9 @@ public class WalletService {
     UserWallet userWallet = getUserWallet(email);
     validateWithdrawRequest(email, amount, user, userWallet);
 
-    Integer currentBalance = userWallet.getBalance();
+    Double currentBalance = userWallet.getBalance();
     WithdrawRequest withdrawRequest = new WithdrawRequest(email, amount);
-    int newBalance = currentBalance - withdrawRequest.getTotalAmount();
+    double newBalance = currentBalance - withdrawRequest.getTotalAmount();
     userWallet.setBalance(newBalance);
     log.info("Email {}, current balance - {}, new balance - {}",
         email, currentBalance, newBalance);

@@ -81,6 +81,7 @@ public class UserService {
 
   }
 
+//  @Transactional
   @Retryable(retryFor = UserCodeException.class)
   public void registerUser(UserRequest userRequest) {
     log.info("inside UserService::registerUser for email - {}", userRequest.email());
@@ -105,7 +106,7 @@ public class UserService {
   private void createNewUserWallet(String email) {
     UserWallet userWallet = new UserWallet();
     userWallet.setEmail(email);
-    userWallet.setBalance(0);
+    userWallet.setBalance(0D);
     userWalletRepository.save(userWallet);
   }
 

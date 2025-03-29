@@ -14,7 +14,7 @@ public class UserDetails {
   private String phoneNo;
   private Integer level;
   private WalletDetails walletDetails;
-  private Integer walletBalance;
+  private Double walletBalance;
 
   public UserDetails(User user) {
     this.username = user.getUsername();
@@ -27,9 +27,9 @@ public class UserDetails {
   @Data
   @NoArgsConstructor
   @AllArgsConstructor
-  public static class WalletDetails{
+  public static class WalletDetails {
     private String trc20Address;
     private String bep20Address;
-    private Integer walletBalance;
+    private Double walletBalance;
   }
 }

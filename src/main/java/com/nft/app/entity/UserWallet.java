@@ -20,7 +20,7 @@ public class UserWallet {
 
   @Indexed(unique = true)
   private String email;
-  private Integer balance;
+  private Double balance;
 
   @CreatedDate
   private LocalDateTime createdDate;
