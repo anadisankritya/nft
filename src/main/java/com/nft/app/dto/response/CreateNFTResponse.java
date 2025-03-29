@@ -34,8 +34,8 @@ public class CreateNFTResponse {
         this.buyPrice = nftDetails.getBuyPrice();
         this.blockPeriod = nftDetails.getBlockPeriod();
         this.category = nftDetails.getCategory();
-        this.investmentTypeId = nftDetails.getInvestmentType();
-        this.userLevelId = nftDetails.getAllowedLevel();
+        this.investmentTypeId = nftDetails.getInvestmentTypeId();
+        this.userLevelId = nftDetails.getLevelId();
         this.status = nftDetails.getStatus();
         this.nftCode = nftDetails.getNftCode();
     }

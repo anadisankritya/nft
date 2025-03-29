@@ -105,9 +105,11 @@ function saveInvestment() {
         ownerName: $('#ownerName').val(),
         buyPrice: parseFloat($('#buyPrice').val()),
         profit: parseFloat($('#profit').val()),
-        investmentType: $('#investmentType').val(),
-        status: $('#status').val() === 'true',
-        image: currentImageData
+        investmentTypeId: $('#investmentType').val(),
+        status: $('#status').val() === 'on',
+        image: currentImageData,
+        levelId: $('#allowedLevel').val(),
+        category: $('#category').val()
     };
 
     const method = currentId ? 'PUT' : 'POST';
