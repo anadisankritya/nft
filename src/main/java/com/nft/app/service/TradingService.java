@@ -1,5 +1,6 @@
 package com.nft.app.service;
 
+import com.mongodb.DuplicateKeyException;
 import com.nft.app.dto.request.BuyOrderDto;
 import com.nft.app.dto.response.CreateNFTResponse;
 import com.nft.app.dto.response.CreateUserLevelResponse;
