@@ -106,7 +106,7 @@ public class WalletService {
         case "SUCCESS" -> updateWithdrawRequest(status, comment, withdrawRequest);
         case "FAILED" -> {
           updateWithdrawRequest(status, comment, withdrawRequest);
-          depositFunds(withdrawRequest.getEmail(), withdrawRequest.getTotalAmount());
+          updateWallet(withdrawRequest.getEmail(), withdrawRequest.getTotalAmount());
         }
         default -> throw new NftException(ErrorCode.INVALID_REQUEST);
       }
@@ -133,7 +133,7 @@ public class WalletService {
       switch (status) {
         case "SUCCESS" -> {
           updateDepositRequest(status, comment, depositRequest);
-          depositFunds(depositRequest.getEmail(), depositRequest.getAmount());
+          updateWallet(depositRequest.getEmail(), depositRequest.getAmount());
         }
         case "FAILED" -> updateDepositRequest(status, comment, depositRequest);
         default -> throw new NftException(ErrorCode.INVALID_REQUEST);
@@ -141,7 +141,7 @@ public class WalletService {
     }
   }
 
-  private void depositFunds(String email, Integer amount) {
+  private void updateWallet(String email, Integer amount) {
     UserWallet userWallet = getUserWallet(email);
     userWallet.setBalance(userWallet.getBalance() + amount);
     userWalletRepository.save(userWallet);
