@@ -141,7 +141,7 @@ public class WalletService {
     }
   }
 
-  private void updateWallet(String email, Integer amount) {
+  public void updateWallet(String email, Integer amount) {
     UserWallet userWallet = getUserWallet(email);
     userWallet.setBalance(userWallet.getBalance() + amount);
     userWalletRepository.save(userWallet);

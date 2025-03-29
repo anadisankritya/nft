@@ -230,4 +230,9 @@ public class UserLevelService {
         return userLevelRepository.findById(id)
             .orElseThrow(() -> new UserLevelException(ErrorCode.USER_LEVEL_NOT_FOUND));
       }
+
+      public UserLevel getBaseUserLevel() {
+        return userLevelRepository.findByBaseLevel(Boolean.TRUE)
+                .orElseThrow(() -> new UserLevelException(ErrorCode.USER_LEVEL_NOT_FOUND));
+      }
     }
