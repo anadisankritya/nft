@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layouts/layout}">
+<head>
+  <title>Investment Types</title>
+  <th:block layout:fragment="headcontent">
+    <meta name="description" content="Admin dashboard page">
+    <link th:href="@{/css/investments-types.css}" rel="stylesheet">
+  </th:block>
+</head>
+<body>
+<div layout:fragment="content">
+  <div class="d-flex justify-content-between align-items-center p-3">
+    <h2 class="fw-bold text-primary">Investment Type</h2>
+    <button class="btn btn-primary rounded-pill px-4"
+            onclick="openCreate()"
+            data-bs-toggle="modal"
+            data-bs-target="#editModal">
+      <i class="bi bi-plus-lg me-2"></i>Add New Investment Type
+    </button>
+  </div>
+  <div class="container-fluid">
+    <article th:replace="~{components/table :: table}"></article>
+    <div class="mobile-card" id="mobileCardBody"></div>
+    <article th:replace="~{components/pagination :: pagination}"></article>
+    <article th:replace="~{components/investment_model :: invesetmentModel}"></article>
+  </div>
+</div>
+
+<th:block layout:fragment="scriptcontent">
+  <script th:src="@{/js/investment.js}"></script>
+</th:block>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <!-- Edit/Create Modal -->
+    <div th:fragment="nftUploadModel" class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title fw-bold" id="modalTitle">Create NFT Investment</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="investmentForm">
+                        <input type="hidden" id="id">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="name" class="form-label fw-semibold">Name *</label>
+                                    <input type="text" class="form-control" id="name" required minlength="2" maxlength="50">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="ownerName" class="form-label fw-semibold">Owner Name *</label>
+                                    <input type="text" class="form-control" id="ownerName" required minlength="2" maxlength="50">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="investmentType" class="form-label fw-semibold">Investment Type *</label>
+                                    <input type="text" class="form-control" id="investmentType" required minlength="2" maxlength="30">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="allowedLevel" class="form-label fw-semibold">Allowed Level *</label>
+                                    <input type="text" class="form-control" id="allowedLevel" required minlength="2" maxlength="50">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="imageInput" class="form-label fw-semibold">Image *</label>
+                                    <input type="file" class="form-control" id="imageInput" accept="image/*" required>
+                                    <div id="imagePreviewContainer" class="mt-2"></div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="buyPrice" class="form-label fw-semibold">Buy Price (USD) *</label>
+                                    <input type="number" class="form-control" id="buyPrice" step="0.01" min="0.01" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="profit" class="form-label fw-semibold">Profit (USD) *</label>
+                                    <input type="number" class="form-control" id="profit" step="0.01" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="blockPeriod" class="form-label fw-semibold">Block Period (Days) *</label>
+                                    <input type="number" class="form-control" id="blockPeriod" min="1" max="3650" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="category" class="form-label fw-semibold">Category *</label>
+                                    <input type="text" class="form-control" id="category" required minlength="2" maxlength="30">
+                                </div>
+                                <div class="mb-3 form-check">
+                                    <input type="checkbox" class="form-check-input" id="status">
+                                    <label class="form-check-label fw-semibold" for="status">Active</label>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary rounded-pill px-4" onclick="saveInvestment()">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

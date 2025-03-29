@@ -18,10 +18,10 @@ public class InvestmentType {
     @Id
     private String id;
     private String name;
-    private List<String> allowedLevels;
+    private List<UserLevel> allowedLevels;
 
     public InvestmentType(CreateInvestmentRequest createInvestmentRequest) {
         this.name = createInvestmentRequest.getName();
-        this.allowedLevels = createInvestmentRequest.getAllowedLevels();
+        this.allowedLevels = createInvestmentRequest.getUserLevels();
     }
 }

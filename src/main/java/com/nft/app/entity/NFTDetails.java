@@ -10,17 +10,17 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@Document(collection = "userLevels")
+@Document(collection = "nftDetails")
 public class NFTDetails {
     @Id
     private String id;
     private String name;
+    private String nftCode;
     private String imageId;
     private String checkSum;
-    private String randomName;
     private String ownerName;
-    private BigDecimal profit;
-    private BigDecimal buyPrice;
+    private Double profit;
+    private Double buyPrice;
     private Integer blockPeriod;
     private String category;
     private String InvestmentType;

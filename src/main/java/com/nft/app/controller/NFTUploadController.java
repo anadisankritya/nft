@@ -2,12 +2,9 @@ package com.nft.app.controller;
 
 import com.nft.app.dto.NftResponse;
 import com.nft.app.dto.request.CreateNFTRequest;
-import com.nft.app.dto.request.CreateUserLevelRequest;
-import com.nft.app.dto.request.UpdateUserLevelRequest;
 import com.nft.app.dto.response.CreateNFTResponse;
-import com.nft.app.dto.response.CreateUserLevelResponse;
+import com.nft.app.dto.response.PageResponse;
 import com.nft.app.service.NFTService;
-import com.nft.app.service.UserLevelService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,12 +21,15 @@ public class NFTUploadController {
     private NFTService nftService;
 
     @GetMapping("/list")
-    public ResponseEntity<NftResponse<List<CreateNFTResponse>>> getAllNFT(
+    public ResponseEntity<NftResponse<PageResponse<List<CreateNFTResponse>>>> getAllNFT(
+            @RequestParam(required = false) String levelId,
+            @RequestParam(required = false) String investmentTypeId,
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new NftResponse<>("User Levels data",
-                        nftService.getAllNFTDetails(page, size)));
+                        nftService.getAllNFTDetails(investmentTypeId,levelId,
+                                page, size)));
     }
 
     @GetMapping("/{id}")

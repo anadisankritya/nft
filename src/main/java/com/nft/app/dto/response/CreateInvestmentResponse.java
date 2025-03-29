@@ -1,6 +1,7 @@
 package com.nft.app.dto.response;
 
 import com.nft.app.entity.InvestmentType;
+import com.nft.app.entity.UserLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,7 +14,7 @@ import java.util.List;
 public class CreateInvestmentResponse {
     private String id;
     private String name;
-    private List<String> allowedLevels;
+    private List<UserLevel> allowedLevels;
 
     public CreateInvestmentResponse(InvestmentType investmentType) {
         this.id = investmentType.getId();
