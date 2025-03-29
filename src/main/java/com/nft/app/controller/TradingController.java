@@ -19,7 +19,7 @@ public class TradingController {
     public ResponseEntity<NftResponse<String>> createBuyOrder(@RequestBody BuyOrderDto buyOrderDto) {
         String email = getUserEmail();
         tradingService.createBuyOrder(buyOrderDto, email);
-        return ResponseEntity.ok(new NftResponse<>("OTP sent", null));
+        return ResponseEntity.ok(new NftResponse<>("Order buy successfully", null));
     }
 
 
