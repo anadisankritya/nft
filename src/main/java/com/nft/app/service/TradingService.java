@@ -37,7 +37,5 @@ public class TradingService {
         CreateUserLevelResponse userLevelResponse =  userLevelService.getUserLevelById(userLevelId);
         if (userDetails.getLevel() > userLevelResponse.getSeq())
             throw new TradingException(ErrorCode.INVALID_USER_LEVEL);
-
-        walletService.
     }
 }
