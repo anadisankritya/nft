@@ -35,7 +35,7 @@ public class User {
 
   @Indexed(unique = true)
   private String phoneNo;
-  private Integer level;
+  private String levelId;
   private String walletId;
 
   @CreatedDate
@@ -50,6 +50,5 @@ public class User {
     this.password = Base64Utils.encodeString(userRequest.password());
     this.referralCode = userRequest.referralCode();
     this.phoneNo = userRequest.phoneNo();
-    this.level = 0;
   }
 }

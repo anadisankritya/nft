@@ -6,6 +6,7 @@ import com.nft.app.dto.response.UserDetails;
 import com.nft.app.dto.response.UserTeamResponse;
 import com.nft.app.entity.AppConfig;
 import com.nft.app.entity.User;
+import com.nft.app.entity.UserLevel;
 import com.nft.app.entity.UserWallet;
 import com.nft.app.entity.WalletMaster;
 import com.nft.app.exception.ErrorCode;
@@ -43,6 +44,7 @@ public class UserService {
   private final OtpService otpService;
   private final WalletMasterRepository walletMasterRepository;
   private final UserWalletRepository userWalletRepository;
+  private final UserLevelService userLevelService;
 
   @PostConstruct
   private void init() {
@@ -90,6 +92,9 @@ public class UserService {
     String userCode = AlphabeticalCodeGenerator.generateEightLetterCode();
     user.setUserCode(userCode);
     user.setWalletId(getRandomWallet());
+
+    UserLevel userLevel = userLevelService.getBaseUserLevel();
+    user.setLevelId(userLevel.getId());
 
     String email = user.getEmail();
     log.info("email - {} , generated userCode - {}", email, userCode);
@@ -180,6 +185,8 @@ public class UserService {
         new UserDetails.WalletDetails(walletMaster.getTrc20Address(), walletMaster.getBep20Address(), userWallet.getBalance());
 
     UserDetails userDetails = new UserDetails(user);
+    String levelName = userLevelService.getUserLevelById(user.getLevelId()).getName();
+    userDetails.setLevelName(levelName);
     userDetails.setWalletDetails(walletDetails);
     userDetails.setWalletBalance(userWallet.getBalance());
     return userDetails;

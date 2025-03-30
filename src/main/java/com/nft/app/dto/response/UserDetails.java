@@ -12,7 +12,8 @@ public class UserDetails {
   private String email;
   private String userCode;
   private String phoneNo;
-  private Integer level;
+  private String levelName;
+  private String levelId;
   private WalletDetails walletDetails;
   private Double walletBalance;
 
@@ -21,7 +22,7 @@ public class UserDetails {
     this.email = user.getEmail();
     this.userCode = user.getUserCode();
     this.phoneNo = user.getPhoneNo();
-    this.level = user.getLevel();
+    this.levelId = user.getLevelId();
   }
 
   @Data
