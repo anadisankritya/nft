@@ -109,7 +109,8 @@ function saveInvestment() {
         status: $('#status').val() === 'on',
         image: currentImageData,
         levelId: $('#allowedLevel').val(),
-        category: $('#category').val()
+        category: $('#category').val(),
+        blockPeriod:$("#blockPeriod").val()
     };
 
     const method = currentId ? 'PUT' : 'POST';

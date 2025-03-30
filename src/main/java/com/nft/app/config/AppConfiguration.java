@@ -30,6 +30,7 @@ public class AppConfiguration {
     appConfig.setOtpRequired(false);
     appConfig.setReferralCodeMandatory(false);
     appConfig.setMinWithdrawDays(7);
+    appConfig.setBlockProfitSharing(Boolean.TRUE);
     appConfigRepository.deleteAll();
     appConfigRepository.save(appConfig);
 
@@ -39,12 +40,12 @@ public class AppConfiguration {
 //    DepositRequest depositRequest = getDepositRequest();
 //    depositRequestRepository.save(depositRequest);
 
-    WalletMaster walletMaster = new WalletMaster();
-    walletMaster.setWalletName("wallet1");
-    walletMaster.setBep20Address("bep20address");
-    walletMaster.setTrc20Address("trc20address");
-    walletMasterRepository.deleteAll();
-    walletMasterRepository.save(walletMaster);
+//    WalletMaster walletMaster = new WalletMaster();
+//    walletMaster.setWalletName("wallet1");
+//    walletMaster.setBep20Address("bep20address");
+//    walletMaster.setTrc20Address("trc20address");
+//    walletMasterRepository.deleteAll();
+//    walletMasterRepository.save(walletMaster);
 
 
   }

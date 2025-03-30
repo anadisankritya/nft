@@ -27,7 +27,7 @@ public class TradingDetailsEntity {
     private Long sellBlockTill;
     private boolean userProfitShared;
     private boolean userProfitBlocked;
-    private Map<String, Long> userProfitBreakup;
+    private Map<String, Double> userProfitBreakup;
     private boolean breakupCreated;
     private TradeStatusEnum tradeStatus;
 }
