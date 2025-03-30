@@ -10,4 +10,8 @@ import java.util.Optional;
 @Repository
 public interface TradingDetailsRepository extends MongoRepository<TradingDetailsEntity, String> {
     Optional<TradingDetailsEntity> findByCreatedByAndNftId(String userCode, @NotBlank(message = "nftId is required") String nftId);
+
+    Optional<TradingDetailsEntity> findByCreatedByAndId(String userCode, @NotBlank(message = "orderId is required") String orderId);
+
+    Optional<TradingDetailsEntity> findByCreatedByAndIdAndOperation(String userCode, @NotBlank(message = "orderId is required") String orderId, String buy);
 }

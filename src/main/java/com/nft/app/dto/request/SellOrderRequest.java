@@ -6,11 +6,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class BuyOrderDto {
-    @NotBlank(message = "nftId is required")
-    private String nftId;
+@Setter
+@Getter
+public class SellOrderRequest {
+    @NotBlank(message = "orderId is required")
+    private String orderId;
 }

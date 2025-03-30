@@ -17,5 +17,6 @@ public class AppConfig {
   private Boolean referralCodeMandatory;
   private Boolean otpRequired;
   private Integer minWithdrawDays;
+  private Boolean blockProfitSharing;
 
 }
