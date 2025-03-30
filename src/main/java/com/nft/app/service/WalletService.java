@@ -9,6 +9,7 @@ import com.nft.app.entity.WithdrawRequest;
 import com.nft.app.exception.ErrorCode;
 import com.nft.app.exception.NftException;
 import com.nft.app.repository.DepositRequestRepository;
+import com.nft.app.repository.TransactionRecordRepository;
 import com.nft.app.repository.UserWalletRepository;
 import com.nft.app.repository.WalletMasterRepository;
 import com.nft.app.repository.WithdrawRequestRepository;
@@ -33,6 +34,7 @@ public class WalletService {
   private final WalletMasterRepository walletMasterRepository;
   private final WithdrawRequestRepository withdrawRequestRepository;
   private final UserService userService;
+  private final TransactionRecordRepository transactionRecordRepository;
 
   public void depositFund(String email, FundDepositRequest fundDepositRequest) {
     log.info("inside WalletService::depositFund for email - {}, amount - {}, tranId - {}",
@@ -106,7 +108,7 @@ public class WalletService {
         case "SUCCESS" -> updateWithdrawRequest(status, comment, withdrawRequest);
         case "FAILED" -> {
           updateWithdrawRequest(status, comment, withdrawRequest);
-          updateWallet(withdrawRequest.getEmail(), withdrawRequest.getTotalAmount());
+          updateWallet(withdrawRequest.getEmail(), withdrawRequest.getTotalAmount(), "WITHDRAW_FAILED");
         }
         default -> throw new NftException(ErrorCode.INVALID_REQUEST);
       }
@@ -133,7 +135,7 @@ public class WalletService {
       switch (status) {
         case "SUCCESS" -> {
           updateDepositRequest(status, comment, depositRequest);
-          updateWallet(depositRequest.getEmail(), depositRequest.getAmount().doubleValue());
+          updateWallet(depositRequest.getEmail(), depositRequest.getAmount().doubleValue(), "DEPOSIT");
         }
         case "FAILED" -> updateDepositRequest(status, comment, depositRequest);
         default -> throw new NftException(ErrorCode.INVALID_REQUEST);
@@ -141,7 +143,7 @@ public class WalletService {
     }
   }
 
-  public void updateWallet(String email, Double amount) {
+  public void updateWallet(String email, Double amount, String type) {
     UserWallet userWallet = getUserWallet(email);
     userWallet.setBalance(userWallet.getBalance() + amount);
     userWalletRepository.save(userWallet);

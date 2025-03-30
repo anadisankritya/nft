@@ -46,6 +46,15 @@ public class UserController {
     return ResponseEntity.ok(new NftResponse<>("My team list fetched", userTeamList));
   }
 
+  @GetMapping("/api/v1/refer-app")
+  public ResponseEntity<NftResponse<String>> referApp() {
+    String email = getUserEmail();
+    UserDetails userDetails = userService.getUserDetails(email);
+    return ResponseEntity.ok(new NftResponse<>(
+        "Download the app using link - https//app-link.com. Use referral code - " + userDetails.getUserCode(), null)
+    );
+  }
+
   private static String getUserEmail() {
     return SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
   }

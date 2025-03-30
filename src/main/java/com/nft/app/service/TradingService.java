@@ -70,8 +70,7 @@ public class TradingService {
 
     try {
       tradingDetailsRepository.save(tradingDetailsEntity);
-      walletService.updateWallet(
-          email, nftDetails.getBuyPrice());
+      walletService.updateWallet(email, nftDetails.getBuyPrice(), "BUY_ORDER");
     } catch (DuplicateKeyException e) {
       throw new TradingException(ErrorCode.DUPLICATE_BUY_ORDER);
     } catch (Exception e) {
