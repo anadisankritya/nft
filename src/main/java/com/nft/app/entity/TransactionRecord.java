@@ -14,8 +14,16 @@ public class TransactionRecord {
   private String id;
 
   private String email;
-  private Double previousAmount;
+  private Double previousBalance;
   private Double changeAmount;
-  private Double newAmount;
+  private Double newBalance;
   private String type;
+
+  public TransactionRecord(String email, Double currentAmount, Double changeAmount, String type) {
+    this.email = email;
+    this.previousBalance = currentAmount;
+    this.changeAmount = changeAmount;
+    this.newBalance = currentAmount - changeAmount;
+    this.type = type;
+  }
 }

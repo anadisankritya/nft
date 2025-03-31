@@ -28,6 +28,7 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -111,7 +112,7 @@ public class UserService {
   private void createNewUserWallet(String email) {
     UserWallet userWallet = new UserWallet();
     userWallet.setEmail(email);
-    userWallet.setBalance(0D);
+    userWallet.setBalance(0);
     userWalletRepository.save(userWallet);
   }
 
@@ -139,6 +140,11 @@ public class UserService {
     //validate username
     if (userRepository.existsByUsername(user.getUsername())) {
       throw new NftException(ErrorCode.USERNAME_ALREADY_EXISTS);
+    }
+
+    List<User> referralCodeUsedToday = userRepository.findByReferralCodeAndCreatedDateGreaterThanEqual(user.getReferralCode(), LocalDateTime.now().minusDays(1L));
+    if (referralCodeUsedToday.size() >= appConfig.getMaxReferralPerDay()) {
+      throw new NftException(ErrorCode.MAX_REFERRAL_EXCEEDED);
     }
 
     //validate user code

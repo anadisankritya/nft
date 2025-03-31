@@ -2,7 +2,6 @@ package com.nft.app.config;
 
 import com.nft.app.entity.AppConfig;
 import com.nft.app.entity.DepositRequest;
-import com.nft.app.entity.WalletMaster;
 import com.nft.app.repository.AppConfigRepository;
 import com.nft.app.repository.DepositRequestRepository;
 import com.nft.app.repository.WalletMasterRepository;
@@ -31,6 +30,7 @@ public class AppConfiguration {
     appConfig.setReferralCodeMandatory(false);
     appConfig.setMinWithdrawDays(7);
     appConfig.setBlockProfitSharing(Boolean.TRUE);
+    appConfig.setMaxReferralPerDay(10);
     appConfigRepository.deleteAll();
     appConfigRepository.save(appConfig);
 

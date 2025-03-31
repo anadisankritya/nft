@@ -20,11 +20,19 @@ public class UserWallet {
 
   @Indexed(unique = true)
   private String email;
-  private Double balance;
+  private double balance;
+
+  private double maxBalance;
 
   @CreatedDate
   private LocalDateTime createdDate;
 
   @LastModifiedDate
   private LocalDateTime updatedDate;
+
+  public void setBalance(final double balance) {
+    this.balance = balance;
+    this.maxBalance = Math.max(this.balance, this.maxBalance);
+  }
+
 }

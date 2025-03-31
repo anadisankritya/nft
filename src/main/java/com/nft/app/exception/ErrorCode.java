@@ -48,7 +48,8 @@ public enum ErrorCode {
   DUPLICATE_BUY_ORDER("133", CONFLICT, "Duplicate order request"),
   INVALID_USER_LEVEL("134", BAD_REQUEST, "User Level is not allowed to buy selected nft"),
   INVALID_WALLET_AMOUNT("135", BAD_REQUEST, "User wallet amount should be greater then nft balance"),
-  TRADING_BUY_ORDER_FAILED("136",INTERNAL_SERVER_ERROR, "Something went wrong, Please retry");
+  TRADING_BUY_ORDER_FAILED("136", INTERNAL_SERVER_ERROR, "Something went wrong, Please retry"),
+  MAX_REFERRAL_EXCEEDED("137", BAD_REQUEST, "Max referral count exceeded for this referral code");
 
   private final String code;
   private final HttpStatus httpStatus;

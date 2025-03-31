@@ -31,12 +31,15 @@ public class User {
 
   @Indexed(unique = true)
   private String userCode;
+
+  @Indexed
   private String referralCode;
 
   @Indexed(unique = true)
   private String phoneNo;
   private String levelId;
   private String walletId;
+  private Boolean admin;
 
   @CreatedDate
   private LocalDateTime createdDate;
