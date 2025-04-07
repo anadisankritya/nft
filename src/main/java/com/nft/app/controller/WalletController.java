@@ -35,9 +35,10 @@ public class WalletController {
   }
 
   @PostMapping("/api/v1/withdraw")
-  public ResponseEntity<NftResponse<Void>> deposit(@RequestParam(defaultValue = "0") Integer amount) {
+  public ResponseEntity<NftResponse<Void>> deposit(@RequestParam(defaultValue = "0") Integer amount,
+                                                   @RequestParam(required = false) String otp) {
     String email = getUserEmail();
-    walletService.withdrawFund(email, amount);
+    walletService.withdrawFund(email, amount, otp);
     return ResponseEntity.ok(new NftResponse<>("Withdraw request sent, " +
         "your money will be credited in 72 hours", null));
   }

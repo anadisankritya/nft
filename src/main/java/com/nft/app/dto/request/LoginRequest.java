@@ -12,6 +12,8 @@ public record LoginRequest(
     @NotEmpty(message = "Password is required")
     @Size(min = 8, message = "Password must be at least 8 characters long")
     String password,
-    String otp
+    String otp,
+    String deviceId,
+    String imei
 ) {
 }

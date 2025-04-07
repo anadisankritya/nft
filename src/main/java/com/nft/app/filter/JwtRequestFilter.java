@@ -1,5 +1,6 @@
 package com.nft.app.filter;
 
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.nft.app.dto.NftResponse;
 import com.nft.app.exception.ErrorCode;
 import com.nft.app.exception.NftException;
@@ -29,7 +30,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class JwtRequestFilter extends OncePerRequestFilter {
 
-  private final JwtUtil jwtUtil;
   private static final List<String> BYPASS_URI_LIST = List.of(
       "/nft/register/api/v1/send-email-otp",
       "/nft/register/api/v1/send-phone-otp",
@@ -46,34 +46,42 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
     String email;
 
-    if (token == null) {
-      throw new NftException(ErrorCode.INVALID_TOKEN);
-    }
-
     try {
-      email = jwtUtil.extractEmail(token);
+
+      if (token == null) {
+        throw new NftException(ErrorCode.INVALID_TOKEN);
+      }
+
+      email = JwtUtil.extractEmail(token);
 
 //    if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
       if (email != null) {
-        if (jwtUtil.validateToken(token, email)) {
+        if (JwtUtil.validateToken(token, email)) {
           UsernamePasswordAuthenticationToken authToken =
               new UsernamePasswordAuthenticationToken(email, null, new ArrayList<>());
           authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
           SecurityContextHolder.getContext().setAuthentication(authToken);
         } else {
-          logger.info("Token verification failed");
-          throw new RuntimeException("Invalid token");
+          log.info("Token verification failed");
+          throw new NftException(ErrorCode.INVALID_TOKEN);
         }
       }
+    } catch (TokenExpiredException ex) {
+      generateExceptionResponse(ErrorCode.TOKEN_EXPIRED, response);
+      return;
     } catch (Exception e) {
-      NftResponse<Object> nftResponse = new NftResponse<>(ErrorCode.INVALID_TOKEN);
-      response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-      response.setStatus(ErrorCode.INVALID_TOKEN.getHttpStatus().value());
-      response.getWriter().write(JsonUtils.convertObjectToJson(nftResponse));
+      generateExceptionResponse(ErrorCode.INVALID_TOKEN, response);
       return;
     }
 
     chain.doFilter(request, response);
+  }
+
+  private static void generateExceptionResponse(ErrorCode tokenExpired, HttpServletResponse response) throws IOException {
+    NftResponse<Object> nftResponse = new NftResponse<>(tokenExpired);
+    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+    response.setStatus(ErrorCode.INVALID_TOKEN.getHttpStatus().value());
+    response.getWriter().write(JsonUtils.convertObjectToJson(nftResponse));
   }
 
   @Override

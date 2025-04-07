@@ -26,10 +26,17 @@ public class UserController {
 
   @PostMapping("/api/v1/login")
   public ResponseEntity<NftResponse<?>> login(@RequestBody LoginRequest loginRequest) {
-    String token = userService.loginUser(loginRequest.email(), loginRequest.password());
+    String token = userService.loginUser(loginRequest);
     Map<String, String> responseMap = new HashMap<>();
     responseMap.put("accessToken", token);
     return ResponseEntity.ok(new NftResponse<>("Login success", responseMap));
+  }
+
+  @PostMapping("/api/v1/logout")
+  public ResponseEntity<NftResponse<Void>> logout() {
+    String email = getUserEmail();
+    userService.logoutUser(email);
+    return ResponseEntity.ok(new NftResponse<>("Logout success", null));
   }
 
   @GetMapping("/api/v1/my-profile")

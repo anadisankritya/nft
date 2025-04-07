@@ -1,12 +1,14 @@
 package com.nft.app.service;
 
 import com.nft.app.constant.AppConstants;
+import com.nft.app.dto.request.LoginRequest;
 import com.nft.app.dto.request.UserRequest;
 import com.nft.app.dto.response.UserDetails;
 import com.nft.app.dto.response.UserTeamResponse;
 import com.nft.app.entity.AppConfig;
 import com.nft.app.entity.User;
 import com.nft.app.entity.UserLevel;
+import com.nft.app.entity.UserToken;
 import com.nft.app.entity.UserWallet;
 import com.nft.app.entity.WalletMaster;
 import com.nft.app.exception.ErrorCode;
@@ -14,6 +16,7 @@ import com.nft.app.exception.NftException;
 import com.nft.app.exception.UserCodeException;
 import com.nft.app.repository.AppConfigRepository;
 import com.nft.app.repository.UserRepository;
+import com.nft.app.repository.UserTokenRepository;
 import com.nft.app.repository.UserWalletRepository;
 import com.nft.app.repository.WalletMasterRepository;
 import com.nft.app.util.AlphabeticalCodeGenerator;
@@ -40,12 +43,12 @@ public class UserService {
   public static AppConfig appConfig;
 
   private final UserRepository userRepository;
-  private final JwtUtil jwtUtil;
   private final AppConfigRepository appConfigRepository;
   private final OtpService otpService;
   private final WalletMasterRepository walletMasterRepository;
   private final UserWalletRepository userWalletRepository;
   private final UserLevelService userLevelService;
+  private final UserTokenRepository userTokenRepository;
 
   @PostConstruct
   private void init() {
@@ -153,17 +156,33 @@ public class UserService {
     }
   }
 
-  public String loginUser(String email, String password) {
-    log.info("inside UserService::loginUser for email - {}", email);
+  public String loginUser(LoginRequest loginRequest) {
+    log.info("inside UserService::loginUser for email - {}", loginRequest.email());
 
-    User user = getUser(email);
+    User user = getUser(loginRequest.email());
     String base64EncodedPassword = user.getPassword();
     String savedPassword = Base64Utils.decodeToString(base64EncodedPassword);
 
-    if (savedPassword.equals(password)) {
-      return jwtUtil.generateToken(user.getEmail());
+    if (savedPassword.equals(loginRequest.password())) {
+      String token = JwtUtil.generateToken(user.getEmail());
+      saveToken(loginRequest, token);
+      return token;
     }
     throw new NftException(ErrorCode.INVALID_PASSWORD);
+  }
+
+  private void saveToken(LoginRequest loginRequest, String token) {
+    UserToken userToken = new UserToken(loginRequest, token);
+    expireOldTokens(loginRequest.email());
+    userTokenRepository.save(userToken);
+  }
+
+  private void expireOldTokens(String email) {
+    List<UserToken> userTokenList = userTokenRepository.findByEmailAndActive(email, true);
+    if (!userTokenList.isEmpty()) {
+      userTokenList.forEach(ut -> ut.setActive(false));
+      userTokenRepository.saveAll(userTokenList);
+    }
   }
 
   public UserTeamResponse getUserTeamList(String email) {
@@ -231,6 +250,10 @@ public class UserService {
     List<WalletMaster> walletMasterList = walletMasterRepository.findAll();
     int randomWalletNo = RandomUtils.secure().randomInt(0, walletMasterList.size());
     return walletMasterList.get(randomWalletNo).getId();
+  }
+
+  public void logoutUser(String email) {
+    expireOldTokens(email);
   }
 
 }

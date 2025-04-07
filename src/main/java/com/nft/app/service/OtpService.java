@@ -46,10 +46,10 @@ public class OtpService {
 
   public void verifyOtp(String key, String otp, String type) {
     log.info("inside OtpService::verifyOtp for key - {}", key);
-    Optional<OtpDetails> emailOtpOptional = otpRepository.findByTypeAndKey(type, key);
-    if (emailOtpOptional.isPresent()) {
-      OtpDetails emailOtpDetails = emailOtpOptional.get();
-      if (emailOtpDetails.getOtp().equals(otp)) {
+    Optional<OtpDetails> otpDetailsOptional = otpRepository.findByTypeAndKey(type, key);
+    if (otpDetailsOptional.isPresent()) {
+      OtpDetails otpDetails = otpDetailsOptional.get();
+      if (otpDetails.getOtp().equals(otp)) {
         log.info("Otp verified for key - {}", key);
         return;
       }
