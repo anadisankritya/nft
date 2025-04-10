@@ -165,15 +165,15 @@ public class UserService {
 
     if (savedPassword.equals(loginRequest.password())) {
       String token = JwtUtil.generateToken(user.getEmail());
-      saveToken(loginRequest, token);
+      UserToken userToken = new UserToken(loginRequest, token);
+      saveToken(userToken);
       return token;
     }
     throw new NftException(ErrorCode.INVALID_PASSWORD);
   }
 
-  private void saveToken(LoginRequest loginRequest, String token) {
-    UserToken userToken = new UserToken(loginRequest, token);
-    expireOldTokens(loginRequest.email());
+  private void saveToken(UserToken userToken) {
+    expireOldTokens(userToken.getEmail());
     userTokenRepository.save(userToken);
   }
 
@@ -193,6 +193,18 @@ public class UserService {
     List<String> teamMembers = userRepository.findByReferralCodeOrderByCreatedDateDesc(userCode).stream().map(User::getUsername).toList();
     return new UserTeamResponse(teamMembers);
 
+  }
+
+  public String regenerateToken(String token) {
+    String email = JwtUtil.extractEmail(token);
+    Optional<UserToken> userTokenOptional = userTokenRepository.findTopByEmailOrderByCreatedDateDesc(email);
+    if (userTokenOptional.isPresent() && userTokenOptional.get().getToken().equals(token)) {
+      String newToken = JwtUtil.generateToken(email);
+      UserToken userToken = new UserToken(userTokenOptional.get(), newToken);
+      saveToken(userToken);
+      return newToken;
+    }
+    return "Please Login again";
   }
 
   public UserDetails getUserDetails(String email) {

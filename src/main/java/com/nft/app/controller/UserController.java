@@ -6,11 +6,13 @@ import com.nft.app.dto.response.UserDetails;
 import com.nft.app.dto.response.UserTeamResponse;
 import com.nft.app.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -37,6 +39,12 @@ public class UserController {
     String email = getUserEmail();
     userService.logoutUser(email);
     return ResponseEntity.ok(new NftResponse<>("Logout success", null));
+  }
+
+  @GetMapping("/api/v1/regenerate-token")
+  public ResponseEntity<NftResponse<String>> regenerateToken(@RequestHeader(name = HttpHeaders.AUTHORIZATION) String token) {
+    String regenerateToken = userService.regenerateToken(token);
+    return ResponseEntity.ok(new NftResponse<>(regenerateToken, null));
   }
 
   @GetMapping("/api/v1/my-profile")

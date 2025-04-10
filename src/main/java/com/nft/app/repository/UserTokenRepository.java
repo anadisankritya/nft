@@ -5,11 +5,14 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface UserTokenRepository extends MongoRepository<UserToken, String> {
 
-  List<UserToken> findByToken(String token);
+  Optional<UserToken> findByToken(String token);
+
+  Optional<UserToken> findTopByEmailOrderByCreatedDateDesc(String email);
 
   List<UserToken> findByEmailAndActive(String email, boolean active);
 

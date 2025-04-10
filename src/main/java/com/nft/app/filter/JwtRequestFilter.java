@@ -2,8 +2,10 @@ package com.nft.app.filter;
 
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.nft.app.dto.NftResponse;
+import com.nft.app.entity.UserToken;
 import com.nft.app.exception.ErrorCode;
 import com.nft.app.exception.NftException;
+import com.nft.app.repository.UserTokenRepository;
 import com.nft.app.util.JsonUtils;
 import com.nft.app.util.JwtUtil;
 import jakarta.servlet.FilterChain;
@@ -22,13 +24,16 @@ import org.springframework.util.PathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtRequestFilter extends OncePerRequestFilter {
+  private final UserTokenRepository userTokenRepository;
 
   private static final List<String> BYPASS_URI_LIST = List.of(
       "/nft/register/api/v1/send-email-otp",
@@ -61,6 +66,10 @@ public class JwtRequestFilter extends OncePerRequestFilter {
               new UsernamePasswordAuthenticationToken(email, null, new ArrayList<>());
           authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
           SecurityContextHolder.getContext().setAuthentication(authToken);
+          Optional<UserToken> userTokenOptional = userTokenRepository.findByToken(token);
+          if (userTokenOptional.isEmpty() || !userTokenOptional.get().isActive()) {
+            throw new TokenExpiredException("Token Expired", Instant.now());
+          }
         } else {
           log.info("Token verification failed");
           throw new NftException(ErrorCode.INVALID_TOKEN);

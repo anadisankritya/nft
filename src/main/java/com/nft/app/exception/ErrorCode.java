@@ -50,7 +50,7 @@ public enum ErrorCode {
   INVALID_WALLET_AMOUNT("135", BAD_REQUEST, "User wallet amount should be greater then nft balance"),
   TRADING_BUY_ORDER_FAILED("136", INTERNAL_SERVER_ERROR, "Something went wrong, Please retry"),
   MAX_REFERRAL_EXCEEDED("137", BAD_REQUEST, "Max referral count exceeded for this referral code"),
-  TOKEN_EXPIRED("138", UNAUTHORIZED, "Unauthorized request. Toke expired");
+  TOKEN_EXPIRED("138", UNAUTHORIZED, "Unauthorized request. Token expired");
 
 
   private final String code;

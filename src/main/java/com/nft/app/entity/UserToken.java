@@ -35,4 +35,13 @@ public class UserToken {
     this.expiryDate = LocalDateTime.now().plusDays(1);
   }
 
+  public UserToken(UserToken userToken, String token) {
+    this.email = userToken.getEmail();
+    this.token = token;
+    this.deviceId = userToken.getDeviceId();
+    this.imei = userToken.getImei();
+    this.active = true;
+    this.expiryDate = LocalDateTime.now().plusDays(1);
+  }
+
 }
