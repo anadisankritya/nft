@@ -204,7 +204,7 @@ public class UserService {
       saveToken(userToken);
       return newToken;
     }
-    return "Please Login again";
+    return null;
   }
 
   public UserDetails getUserDetails(String email) {

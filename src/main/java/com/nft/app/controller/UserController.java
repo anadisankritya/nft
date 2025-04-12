@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -42,9 +43,14 @@ public class UserController {
   }
 
   @GetMapping("/api/v1/regenerate-token")
-  public ResponseEntity<NftResponse<String>> regenerateToken(@RequestHeader(name = HttpHeaders.AUTHORIZATION) String token) {
+  public ResponseEntity<NftResponse<?>> regenerateToken(@RequestHeader(name = HttpHeaders.AUTHORIZATION) String token) {
     String regenerateToken = userService.regenerateToken(token);
-    return ResponseEntity.ok(new NftResponse<>(regenerateToken, null));
+    if (StringUtils.hasText(regenerateToken)) {
+      Map<String, String> responseMap = new HashMap<>();
+      responseMap.put("accessToken", token);
+      return ResponseEntity.ok(new NftResponse<>("Token Regenerated", responseMap));
+    }
+    return ResponseEntity.badRequest().body(new NftResponse<>("Please Login again", null));
   }
 
   @GetMapping("/api/v1/my-profile")
