@@ -52,11 +52,21 @@ public class WalletController {
   }
 
   @GetMapping("/api/v1/withdrawal-request")
-  public ResponseEntity<NftResponse<Page<?>>> withdrawalRequests(@RequestParam(required = false) Integer page,
-                                                                 @RequestParam(required = false) Integer size,
+  public ResponseEntity<NftResponse<Page<?>>> withdrawalRequests(@RequestParam(required = false, defaultValue = "0") Integer pageNo,
+                                                                 @RequestParam(required = false, defaultValue = "10") Integer pageSize,
                                                                  @RequestParam List<String> status) {
-    Pageable pageable = PageRequest.of(page, size);
+    Pageable pageable = PageRequest.of(pageNo, pageSize);
     var list = walletService.getWithdrawalRequests(status, pageable);
+    return ResponseEntity.ok(new NftResponse<>(list));
+  }
+
+  @GetMapping("/api/v1/withdrawal-history")
+  public ResponseEntity<NftResponse<Page<?>>> withdrawalHistory(@RequestParam(required = false, defaultValue = "0") Integer pageNo,
+                                                                @RequestParam(required = false, defaultValue = "10") Integer pageSize,
+                                                                @RequestParam(required = false) List<String> status) {
+    String email = getUserEmail();
+    Pageable pageable = PageRequest.of(pageNo, pageSize);
+    var list = walletService.getWithdrawalHistory(email, status, pageable);
     return ResponseEntity.ok(new NftResponse<>(list));
   }
 
@@ -73,11 +83,21 @@ public class WalletController {
   }
 
   @GetMapping("/api/v1/deposit-request")
-  public ResponseEntity<NftResponse<Page<?>>> depositRequests(@RequestParam(required = false) Integer page,
-                                                              @RequestParam(required = false) Integer size,
+  public ResponseEntity<NftResponse<Page<?>>> depositRequests(@RequestParam(required = false, defaultValue = "0") Integer pageNO,
+                                                              @RequestParam(required = false, defaultValue = "10") Integer pageSize,
                                                               @RequestParam List<String> status) {
-    Pageable pageable = PageRequest.of(page, size);
+    Pageable pageable = PageRequest.of(pageNO, pageSize);
     var list = walletService.getDepositRequests(status, pageable);
+    return ResponseEntity.ok(new NftResponse<>(list));
+  }
+
+  @GetMapping("/api/v1/deposit-history")
+  public ResponseEntity<NftResponse<Page<?>>> depositHistory(@RequestParam(required = false, defaultValue = "0") Integer pageNo,
+                                                             @RequestParam(required = false, defaultValue = "0") Integer pageSize,
+                                                             @RequestParam(required = false) List<String> status) {
+    String email = getUserEmail();
+    Pageable pageable = PageRequest.of(pageNo, pageSize);
+    var list = walletService.getDepositHistory(email, status, pageable);
     return ResponseEntity.ok(new NftResponse<>(list));
   }
 

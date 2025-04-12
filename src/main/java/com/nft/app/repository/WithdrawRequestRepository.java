@@ -17,5 +17,9 @@ public interface WithdrawRequestRepository extends MongoRepository<WithdrawReque
 
   Page<WithdrawRequest> findByStatusInOrderByUpdatedDateDesc(List<String> statusList, Pageable pageable);
 
+  Page<WithdrawRequest> findByEmailAndStatusInOrderByIdDesc(String email, List<String> statusList, Pageable pageable);
+
+  Page<WithdrawRequest> findByEmailOrderByIdDesc(String email, Pageable pageable);
+
 
 }

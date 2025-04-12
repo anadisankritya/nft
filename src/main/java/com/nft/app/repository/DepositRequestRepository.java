@@ -17,5 +17,9 @@ public interface DepositRequestRepository extends MongoRepository<DepositRequest
 
   boolean existsByStatusAndTransactionId(String status, String txnId);
 
+  Page<DepositRequest> findByEmailAndStatusInOrderByIdDesc(String email, List<String> statusList, Pageable pageable);
+
+  Page<DepositRequest> findByEmailOrderByIdDesc(String email, Pageable pageable);
+
 
 }

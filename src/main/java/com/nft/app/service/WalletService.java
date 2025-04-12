@@ -22,6 +22,7 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -103,6 +104,14 @@ public class WalletService {
     return withdrawRequestRepository.findByStatusInOrderByUpdatedDateDesc(statusList, pageable);
   }
 
+  public Page<?> getWithdrawalHistory(String email, List<String> statusList, Pageable pageable) {
+    if (CollectionUtils.isEmpty(statusList)) {
+      return withdrawRequestRepository.findByEmailOrderByIdDesc(email, pageable);
+    }
+
+    return withdrawRequestRepository.findByEmailAndStatusInOrderByIdDesc(email, statusList, pageable);
+  }
+
   public void updateWithdrawalRequest(String id, String status, String comment) {
     Optional<WithdrawRequest> withdrawRequestOptional = withdrawRequestRepository.findById(id);
     if (withdrawRequestOptional.isPresent()) {
@@ -129,6 +138,13 @@ public class WalletService {
       return depositRequestRepository.findByStatusIn(statusList, pageable);
     }
     return depositRequestRepository.findByStatusInOrderByUpdatedDateDesc(statusList, pageable);
+  }
+
+  public Page<?> getDepositHistory(String email, List<String> statusList, Pageable pageable) {
+    if (CollectionUtils.isEmpty(statusList)) {
+      return depositRequestRepository.findByEmailOrderByIdDesc(email, pageable);
+    }
+    return depositRequestRepository.findByEmailAndStatusInOrderByIdDesc(email, statusList, pageable);
   }
 
   public void updateDepositRequest(String id, String status, String comment) {
