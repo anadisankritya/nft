@@ -12,7 +12,7 @@ public interface UserTokenRepository extends MongoRepository<UserToken, String> 
 
   Optional<UserToken> findByToken(String token);
 
-  Optional<UserToken> findTopByEmailOrderByCreatedDateDesc(String email);
+  Optional<UserToken> findTopByEmailOrderByIdDesc(String email);
 
   List<UserToken> findByEmailAndActive(String email, boolean active);
 

@@ -26,6 +26,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,14 +40,16 @@ public class JwtRequestFilter extends OncePerRequestFilter {
       "/nft/register/api/v1/send-email-otp",
       "/nft/register/api/v1/send-phone-otp",
       "/nft/register/api/v1/signup",
-      "/nft/user/api/v1/login",
-      "/nft/ui/**"
+      "/nft/user/api/v1/login"
+//      "/nft/**"
   );
+  public static final List<String> ADMIN_PANEL = List.of("admin", "ui", "css", "js");
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
       throws ServletException, IOException {
 
+//    log.info("inside JwtRequestFilter::doFilterInternal");
     final String token = request.getHeader("Authorization");
 
     String email;
@@ -98,8 +101,11 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     PathMatcher pathMatcher = new AntPathMatcher();
     String requestURI = request.getRequestURI();
     String host = request.getHeader("host");
+    List<String> uri = Arrays.stream(requestURI.split("/")).toList();
+    boolean adminPanelRequest = ADMIN_PANEL.contains(uri.get(2));
+
     log.info("checking shouldNotFilter for URI - {}, host - {}", requestURI, host);
-    return BYPASS_URI_LIST.stream().anyMatch(bypassUri -> pathMatcher.match(bypassUri, requestURI));
+    return adminPanelRequest || BYPASS_URI_LIST.stream().anyMatch(bypassUri -> pathMatcher.match(bypassUri, requestURI));
   }
 
 }

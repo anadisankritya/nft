@@ -197,7 +197,7 @@ public class UserService {
 
   public String regenerateToken(String token) {
     String email = JwtUtil.extractEmail(token);
-    Optional<UserToken> userTokenOptional = userTokenRepository.findTopByEmailOrderByCreatedDateDesc(email);
+    Optional<UserToken> userTokenOptional = userTokenRepository.findTopByEmailOrderByIdDesc(email);
     if (userTokenOptional.isPresent() && userTokenOptional.get().getToken().equals(token)) {
       String newToken = JwtUtil.generateToken(email);
       UserToken userToken = new UserToken(userTokenOptional.get(), newToken);
