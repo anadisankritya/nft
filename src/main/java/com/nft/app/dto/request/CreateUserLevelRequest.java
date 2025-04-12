@@ -18,8 +18,6 @@ public class CreateUserLevelRequest {
     private String name;
     @NotNull(message = "image data is required")
     private ImageData image;
-    @NotBlank(message = "content type is required")
-    private String contentType;
     @NotNull(message = "base level is required")
     private Boolean baseLevel;
     @NotNull(message = "start price is required")

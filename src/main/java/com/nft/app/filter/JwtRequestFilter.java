@@ -40,8 +40,10 @@ public class JwtRequestFilter extends OncePerRequestFilter {
       "/nft/register/api/v1/send-email-otp",
       "/nft/register/api/v1/send-phone-otp",
       "/nft/register/api/v1/signup",
-      "/nft/user/api/v1/login"
-//      "/nft/**"
+      "/nft/user/api/v1/login",
+      "/nft/user/api/v1/admin",
+      "/nft/admin/**",
+    
   );
   public static final List<String> ADMIN_PANEL = List.of("admin", "ui", "css", "js");
 

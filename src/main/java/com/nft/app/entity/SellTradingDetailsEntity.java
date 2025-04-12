@@ -17,7 +17,7 @@ public class SellTradingDetailsEntity {
     private String nftId;
     private String operation;
     private Long createdAt;
-    private Long createdBy;
+    private String createdBy;
     private boolean teamProfitShared;
     private boolean teamProfitBlocked;
     private Map<String, Long> teamProfitBreakup;
