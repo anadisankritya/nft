@@ -113,6 +113,15 @@ public class WalletController {
     return ResponseEntity.ok(new NftResponse<>("done", null));
   }
 
+  @GetMapping("/api/v1/all-transaction")
+  public ResponseEntity<NftResponse<Page<?>>> getAllTransactions(@RequestParam(required = false, defaultValue = "0") Integer pageNo,
+                                                                 @RequestParam(required = false, defaultValue = "10") Integer pageSize) {
+    String email = getUserEmail();
+    Pageable pageable = PageRequest.of(pageNo, pageSize);
+    var list = walletService.getAllTransactions(email, pageable);
+    return ResponseEntity.ok(new NftResponse<>(list));
+  }
+
   private static String getUserEmail() {
     return SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
   }

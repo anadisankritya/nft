@@ -201,4 +201,8 @@ public class WalletService {
     depositRequestRepository.save(depositRequest);
   }
 
+  public Page<?> getAllTransactions(String email, Pageable pageable) {
+    return transactionRecordRepository.findByEmailOrderByIdDesc(email, pageable);
+  }
+
 }
