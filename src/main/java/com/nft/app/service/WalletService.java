@@ -2,6 +2,7 @@ package com.nft.app.service;
 
 import com.nft.app.constant.AppConstants;
 import com.nft.app.dto.request.FundDepositRequest;
+import com.nft.app.dto.response.UserDetails;
 import com.nft.app.entity.DepositRequest;
 import com.nft.app.entity.TransactionRecord;
 import com.nft.app.entity.User;
@@ -164,6 +165,18 @@ public class WalletService {
 
   UserWallet getUserWallet(String email) {
     return userWalletRepository.findByEmail(email);
+  }
+
+  public UserDetails.WalletDetails getUserWalletDetails(String email) {
+    User user = userService.getUser(email);
+    UserWallet userWallet = userWalletRepository.findByEmail(user.getEmail());
+    Optional<WalletMaster> walletMasterOptional = walletMasterRepository.findById(user.getWalletId());
+    if (walletMasterOptional.isEmpty()) {
+      throw new NftException(ErrorCode.WALLET_NOT_FOUND);
+    }
+
+    WalletMaster walletMaster = walletMasterOptional.get();
+    return new UserDetails.WalletDetails(walletMaster.getTrc20Address(), walletMaster.getBep20Address(), userWallet.getBalance());
   }
 
   private void updateDepositRequest(String status, String comment, DepositRequest depositRequest) {

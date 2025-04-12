@@ -2,6 +2,7 @@ package com.nft.app.controller;
 
 import com.nft.app.dto.NftResponse;
 import com.nft.app.dto.request.FundDepositRequest;
+import com.nft.app.dto.response.UserDetails;
 import com.nft.app.service.WalletService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -26,6 +27,13 @@ import java.util.List;
 public class WalletController {
 
   private final WalletService walletService;
+
+  @GetMapping("/api/v1/user-wallet")
+  public ResponseEntity<NftResponse<UserDetails.WalletDetails>> depositRequests() {
+    String email = getUserEmail();
+    var userWalletDetails = walletService.getUserWalletDetails(email);
+    return ResponseEntity.ok(new NftResponse<>("User wallet fetched", userWalletDetails));
+  }
 
   @PostMapping("/api/v1/deposit")
   public ResponseEntity<NftResponse<Void>> deposit(@RequestBody FundDepositRequest fundDepositRequest) {
