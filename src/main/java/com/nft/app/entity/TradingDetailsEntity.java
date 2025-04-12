@@ -1,5 +1,6 @@
 package com.nft.app.entity;
 
+import com.nft.app.dto.request.ImageData;
 import com.nft.app.enums.TradeStatusEnum;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,4 +31,5 @@ public class TradingDetailsEntity {
     private Map<String, Double> userProfitBreakup;
     private boolean breakupCreated;
     private TradeStatusEnum tradeStatus;
+    private String nftImageId;
 }
