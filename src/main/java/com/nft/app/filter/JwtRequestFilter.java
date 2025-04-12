@@ -40,10 +40,11 @@ public class JwtRequestFilter extends OncePerRequestFilter {
       "/nft/register/api/v1/send-email-otp",
       "/nft/register/api/v1/send-phone-otp",
       "/nft/register/api/v1/signup",
-      "/nft/user/api/v1/login"
+      "/nft/user/api/v1/login",
+      "nft/user/api/v1/regenerate-token"
 //      "/nft/**"
   );
-  public static final List<String> ADMIN_PANEL = List.of("admin", "ui", "css", "js");
+  public static final List<String> ADMIN_PANEL_LIST = List.of("admin", "ui", "css", "js");
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
@@ -102,7 +103,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     String requestURI = request.getRequestURI();
     String host = request.getHeader("host");
     List<String> uri = Arrays.stream(requestURI.split("/")).toList();
-    boolean adminPanelRequest = ADMIN_PANEL.contains(uri.get(2));
+    boolean adminPanelRequest = ADMIN_PANEL_LIST.contains(uri.get(2));
 
     log.info("checking shouldNotFilter for URI - {}, host - {}", requestURI, host);
     return adminPanelRequest || BYPASS_URI_LIST.stream().anyMatch(bypassUri -> pathMatcher.match(bypassUri, requestURI));
