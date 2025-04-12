@@ -1,12 +1,14 @@
 package com.nft.app.service;
 
 import com.nft.app.constant.AppConstants;
+import com.nft.app.dto.request.LoginRequest;
 import com.nft.app.dto.request.UserRequest;
 import com.nft.app.dto.response.UserDetails;
 import com.nft.app.dto.response.UserTeamResponse;
 import com.nft.app.entity.AppConfig;
 import com.nft.app.entity.User;
 import com.nft.app.entity.UserLevel;
+import com.nft.app.entity.UserToken;
 import com.nft.app.entity.UserWallet;
 import com.nft.app.entity.WalletMaster;
 import com.nft.app.exception.ErrorCode;
@@ -14,6 +16,7 @@ import com.nft.app.exception.NftException;
 import com.nft.app.exception.UserCodeException;
 import com.nft.app.repository.AppConfigRepository;
 import com.nft.app.repository.UserRepository;
+import com.nft.app.repository.UserTokenRepository;
 import com.nft.app.repository.UserWalletRepository;
 import com.nft.app.repository.WalletMasterRepository;
 import com.nft.app.util.AlphabeticalCodeGenerator;
@@ -28,6 +31,7 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,12 +43,12 @@ public class UserService {
   public static AppConfig appConfig;
 
   private final UserRepository userRepository;
-  private final JwtUtil jwtUtil;
   private final AppConfigRepository appConfigRepository;
   private final OtpService otpService;
   private final WalletMasterRepository walletMasterRepository;
   private final UserWalletRepository userWalletRepository;
   private final UserLevelService userLevelService;
+  private final UserTokenRepository userTokenRepository;
 
   @PostConstruct
   private void init() {
@@ -111,7 +115,7 @@ public class UserService {
   private void createNewUserWallet(String email) {
     UserWallet userWallet = new UserWallet();
     userWallet.setEmail(email);
-    userWallet.setBalance(0D);
+    userWallet.setBalance(0);
     userWalletRepository.save(userWallet);
   }
 
@@ -141,23 +145,44 @@ public class UserService {
       throw new NftException(ErrorCode.USERNAME_ALREADY_EXISTS);
     }
 
+    List<User> referralCodeUsedToday = userRepository.findByReferralCodeAndCreatedDateGreaterThanEqual(user.getReferralCode(), LocalDateTime.now().minusDays(1L));
+    if (referralCodeUsedToday.size() >= appConfig.getMaxReferralPerDay()) {
+      throw new NftException(ErrorCode.MAX_REFERRAL_EXCEEDED);
+    }
+
     //validate user code
     if (existsByUserCode) {
       throw new UserCodeException(ErrorCode.DUPLICATE_USER_CODE);
     }
   }
 
-  public String loginUser(String email, String password) {
-    log.info("inside UserService::loginUser for email - {}", email);
+  public String loginUser(LoginRequest loginRequest) {
+    log.info("inside UserService::loginUser for email - {}", loginRequest.email());
 
-    User user = getUser(email);
+    User user = getUser(loginRequest.email());
     String base64EncodedPassword = user.getPassword();
     String savedPassword = Base64Utils.decodeToString(base64EncodedPassword);
 
-    if (savedPassword.equals(password)) {
-      return jwtUtil.generateToken(user.getEmail());
+    if (savedPassword.equals(loginRequest.password())) {
+      String token = JwtUtil.generateToken(user.getEmail());
+      UserToken userToken = new UserToken(loginRequest, token);
+      saveToken(userToken);
+      return token;
     }
     throw new NftException(ErrorCode.INVALID_PASSWORD);
+  }
+
+  private void saveToken(UserToken userToken) {
+    expireOldTokens(userToken.getEmail());
+    userTokenRepository.save(userToken);
+  }
+
+  private void expireOldTokens(String email) {
+    List<UserToken> userTokenList = userTokenRepository.findByEmailAndActive(email, true);
+    if (!userTokenList.isEmpty()) {
+      userTokenList.forEach(ut -> ut.setActive(false));
+      userTokenRepository.saveAll(userTokenList);
+    }
   }
 
   public UserTeamResponse getUserTeamList(String email) {
@@ -168,6 +193,18 @@ public class UserService {
     List<String> teamMembers = userRepository.findByReferralCodeOrderByCreatedDateDesc(userCode).stream().map(User::getUsername).toList();
     return new UserTeamResponse(teamMembers);
 
+  }
+
+  public String regenerateToken(String token) {
+    String email = JwtUtil.extractEmail(token);
+    Optional<UserToken> userTokenOptional = userTokenRepository.findTopByEmailOrderByIdDesc(email);
+    if (userTokenOptional.isPresent() && userTokenOptional.get().getToken().equals(token)) {
+      String newToken = JwtUtil.generateToken(email);
+      UserToken userToken = new UserToken(userTokenOptional.get(), newToken);
+      saveToken(userToken);
+      return newToken;
+    }
+    return null;
   }
 
   public UserDetails getUserDetails(String email) {
@@ -225,6 +262,10 @@ public class UserService {
     List<WalletMaster> walletMasterList = walletMasterRepository.findAll();
     int randomWalletNo = RandomUtils.secure().randomInt(0, walletMasterList.size());
     return walletMasterList.get(randomWalletNo).getId();
+  }
+
+  public void logoutUser(String email) {
+    expireOldTokens(email);
   }
 
 }

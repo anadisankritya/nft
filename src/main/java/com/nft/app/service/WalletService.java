@@ -1,7 +1,9 @@
 package com.nft.app.service;
 
+import com.nft.app.constant.AppConstants;
 import com.nft.app.dto.request.FundDepositRequest;
 import com.nft.app.entity.DepositRequest;
+import com.nft.app.entity.TransactionRecord;
 import com.nft.app.entity.User;
 import com.nft.app.entity.UserWallet;
 import com.nft.app.entity.WalletMaster;
@@ -15,6 +17,7 @@ import com.nft.app.repository.WalletMasterRepository;
 import com.nft.app.repository.WithdrawRequestRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -35,6 +38,7 @@ public class WalletService {
   private final WithdrawRequestRepository withdrawRequestRepository;
   private final UserService userService;
   private final TransactionRecordRepository transactionRecordRepository;
+  private final OtpService otpService;
 
   public void depositFund(String email, FundDepositRequest fundDepositRequest) {
     log.info("inside WalletService::depositFund for email - {}, amount - {}, tranId - {}",
@@ -54,27 +58,25 @@ public class WalletService {
     depositRequestRepository.save(depositRequest);
   }
 
-  public void withdrawFund(String email, Integer amount) {
+  public void withdrawFund(String email, Integer amount, String otp) {
     log.info("inside WalletService::withdrawFund for email - {}, amount - {}", email, amount);
     User user = userService.getUser(email);
+
+    if (BooleanUtils.isTrue(UserService.appConfig.getOtpRequired())) {
+      otpService.verifyOtp(email, otp, AppConstants.EMAIL);
+    }
 
     UserWallet userWallet = getUserWallet(email);
     validateWithdrawRequest(email, amount, user, userWallet);
 
-    Double currentBalance = userWallet.getBalance();
     WithdrawRequest withdrawRequest = new WithdrawRequest(email, amount);
-    double newBalance = currentBalance - withdrawRequest.getTotalAmount();
-    userWallet.setBalance(newBalance);
-    log.info("Email {}, current balance - {}, new balance - {}",
-        email, currentBalance, newBalance);
-
-    userWalletRepository.save(userWallet);
+    updateWallet(email, -withdrawRequest.getTotalAmount(), "WITHDRAW");
     withdrawRequestRepository.save(withdrawRequest);
   }
 
   private void validateWithdrawRequest(String email, Integer amount, User user, UserWallet userWallet) {
     if (amount < 50 || amount > 999) {
-      throw new NftException(ErrorCode.WITHDRAW_AMOUNT_ERROR, 50, 9999);
+      throw new NftException(ErrorCode.WITHDRAW_AMOUNT_ERROR, 50, 999);
     }
 
     if (user.getCreatedDate().isAfter(LocalDateTime.now()
@@ -144,9 +146,20 @@ public class WalletService {
   }
 
   public void updateWallet(String email, Double amount, String type) {
+    log.info("inside WalletService::updateWallet for email - {}, amount - {}, type - {}", email, amount, type);
     UserWallet userWallet = getUserWallet(email);
-    userWallet.setBalance(userWallet.getBalance() + amount);
+    addTransaction(email, userWallet.getBalance(), amount, type);
+
+    Double balance = userWallet.getBalance();
+    userWallet.setBalance(balance + amount);
     userWalletRepository.save(userWallet);
+  }
+
+  private void addTransaction(String email, Double currentBalance, Double changeAmount, String type) {
+    TransactionRecord transactionRecord = new TransactionRecord(email, currentBalance, changeAmount, type);
+    transactionRecordRepository.save(transactionRecord);
+    log.info("transactionRecord saved Email - {}, current balance - {}, new balance - {}",
+        email, currentBalance, transactionRecord.getNewBalance());
   }
 
   UserWallet getUserWallet(String email) {

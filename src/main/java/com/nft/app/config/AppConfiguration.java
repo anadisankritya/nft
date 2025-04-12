@@ -10,7 +10,6 @@ import com.nft.app.repository.WalletMasterRepository;
 import com.nft.app.repository.WithdrawRequestRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.RandomUtils;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,6 +31,7 @@ public class AppConfiguration {
     appConfig.setReferralCodeMandatory(false);
     appConfig.setMinWithdrawDays(7);
     appConfig.setBlockProfitSharing(Boolean.TRUE);
+    appConfig.setMaxReferralPerDay(10);
     appConfigRepository.deleteAll();
     appConfigRepository.save(appConfig);
 
@@ -51,15 +51,15 @@ public class AppConfiguration {
 
   }
 
-  private static DepositRequest getDepositRequest() {
-    DepositRequest depositRequest = new DepositRequest();
-    depositRequest.setEmail("abc" + RandomUtils.secure().randomInt() + "@xyz.com");
-    depositRequest.setStatus("PENDING");
-    depositRequest.setAmount(500);
-    depositRequest.setTransactionId(String.valueOf(RandomUtils.secure().randomInt()));
-    depositRequest.setWalletName("dummyWallet");
-    return depositRequest;
-  }
+//  private static DepositRequest getDepositRequest() {
+//    DepositRequest depositRequest = new DepositRequest();
+//    depositRequest.setEmail("abc" + RandomUtils.secure().randomInt() + "@xyz.com");
+//    depositRequest.setStatus("PENDING");
+//    depositRequest.setAmount(500);
+//    depositRequest.setTransactionId(String.valueOf(RandomUtils.secure().randomInt()));
+//    depositRequest.setWalletName("dummyWallet");
+//    return depositRequest;
+//  }
 
 
   @Bean

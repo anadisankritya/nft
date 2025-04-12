@@ -50,7 +50,10 @@ public enum ErrorCode {
   INVALID_WALLET_AMOUNT("135", BAD_REQUEST, "User wallet amount should be greater then nft balance"),
   TRADING_BUY_ORDER_FAILED("136",INTERNAL_SERVER_ERROR, "Something went wrong, Please retry"),
   INVALID_ORDER_ID("137",BAD_REQUEST, "Order id is invalid"),
-  ERR_ORDER_IS_NOT_READY_FRO_SELL("138",BAD_REQUEST, "Order is not ready for sell");
+  ERR_ORDER_IS_NOT_READY_FRO_SELL("138",BAD_REQUEST, "Order is not ready for sell"),
+  TRADING_BUY_ORDER_FAILED("139", INTERNAL_SERVER_ERROR, "Something went wrong, Please retry"),
+  MAX_REFERRAL_EXCEEDED("140", BAD_REQUEST, "Max referral count exceeded for this referral code"),
+  TOKEN_EXPIRED("141", UNAUTHORIZED, "Unauthorized request. Token expired");
 
   private final String code;
   private final HttpStatus httpStatus;

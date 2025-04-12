@@ -6,11 +6,14 @@ import com.nft.app.dto.response.UserDetails;
 import com.nft.app.dto.response.UserTeamResponse;
 import com.nft.app.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,10 +29,28 @@ public class UserController {
 
   @PostMapping("/api/v1/login")
   public ResponseEntity<NftResponse<?>> login(@RequestBody LoginRequest loginRequest) {
-    String token = userService.loginUser(loginRequest.email(), loginRequest.password());
+    String token = userService.loginUser(loginRequest);
     Map<String, String> responseMap = new HashMap<>();
     responseMap.put("accessToken", token);
     return ResponseEntity.ok(new NftResponse<>("Login success", responseMap));
+  }
+
+  @PostMapping("/api/v1/logout")
+  public ResponseEntity<NftResponse<Void>> logout() {
+    String email = getUserEmail();
+    userService.logoutUser(email);
+    return ResponseEntity.ok(new NftResponse<>("Logout success", null));
+  }
+
+  @GetMapping("/api/v1/regenerate-token")
+  public ResponseEntity<NftResponse<?>> regenerateToken(@RequestHeader(name = HttpHeaders.AUTHORIZATION) String token) {
+    String regenerateToken = userService.regenerateToken(token);
+    if (StringUtils.hasText(regenerateToken)) {
+      Map<String, String> responseMap = new HashMap<>();
+      responseMap.put("accessToken", token);
+      return ResponseEntity.ok(new NftResponse<>("Token Regenerated", responseMap));
+    }
+    return ResponseEntity.badRequest().body(new NftResponse<>("Please Login again", null));
   }
 
   @GetMapping("/api/v1/my-profile")

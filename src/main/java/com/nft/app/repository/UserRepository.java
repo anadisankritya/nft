@@ -4,6 +4,7 @@ import com.nft.app.entity.User;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,5 +19,7 @@ public interface UserRepository extends MongoRepository<User, String> {
   boolean existsByUsername(String username);
 
   boolean existsByPhoneNo(String phoneNo);
+
+  List<User> findByReferralCodeAndCreatedDateGreaterThanEqual(String referralCode, LocalDateTime createdDate);
 
 }
