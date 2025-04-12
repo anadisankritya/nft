@@ -35,7 +35,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
       "/nft/register/api/v1/send-phone-otp",
       "/nft/register/api/v1/signup",
       "/nft/user/api/v1/login",
-      "/nft/ui/**"
+      "/nft/user/api/v1/admin",
+      "/nft/admin/**",
+          "/nft/ui/**"
   );
 
   @Override

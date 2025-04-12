@@ -3,6 +3,7 @@ package com.nft.app.config;
 import com.nft.app.entity.AppConfig;
 import com.nft.app.entity.DepositRequest;
 import com.nft.app.entity.WalletMaster;
+import com.nft.app.entity.WithdrawRequest;
 import com.nft.app.repository.AppConfigRepository;
 import com.nft.app.repository.DepositRequestRepository;
 import com.nft.app.repository.WalletMasterRepository;
