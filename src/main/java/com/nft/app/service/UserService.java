@@ -95,7 +95,7 @@ public class UserService {
     User user = new User(userRequest);
     String userCode = AlphabeticalCodeGenerator.generateEightLetterCode();
     user.setUserCode(userCode);
-    user.setWalletId(getRandomWallet());
+    user.setWalletId(getRandomWalletId());
 
     UserLevel userLevel = userLevelService.getBaseUserLevel();
     user.setLevelId(userLevel.getId());
@@ -258,7 +258,7 @@ public class UserService {
         .orElseThrow(() -> new NftException(ErrorCode.USER_NOT_FOUND));
   }
 
-  private String getRandomWallet() {
+  private String getRandomWalletId() {
     List<WalletMaster> walletMasterList = walletMasterRepository.findAll();
     int randomWalletNo = RandomUtils.secure().randomInt(0, walletMasterList.size());
     return walletMasterList.get(randomWalletNo).getId();
