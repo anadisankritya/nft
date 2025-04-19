@@ -3,12 +3,16 @@ package com.nft.app.controller;
 import com.nft.app.dto.NftResponse;
 import com.nft.app.dto.request.UserRequest;
 import com.nft.app.service.UserService;
+import com.nft.app.util.JwtUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,7 +25,10 @@ public class RegisterController {
   private final UserService userService;
 
   @PostMapping("/api/v1/send-email-otp")
-  public ResponseEntity<NftResponse<Void>> sendEmailOtp(@RequestParam String email) {
+  public ResponseEntity<NftResponse<Void>> sendEmailOtp(@RequestHeader(required = false, name = HttpHeaders.AUTHORIZATION) String token,
+                                                        @RequestParam(required = false) String email) {
+    email = StringUtils.hasText(email) ? email : JwtUtil.extractEmail(token);
+
     userService.sendEmailOtp(email);
     return ResponseEntity.ok(new NftResponse<>("OTP sent", null));
   }
