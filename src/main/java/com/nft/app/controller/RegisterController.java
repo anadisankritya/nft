@@ -28,7 +28,6 @@ public class RegisterController {
   public ResponseEntity<NftResponse<Void>> sendEmailOtp(@RequestHeader(required = false, name = HttpHeaders.AUTHORIZATION) String token,
                                                         @RequestParam(required = false) String email) {
     email = StringUtils.hasText(email) ? email : JwtUtil.extractEmail(token);
-
     userService.sendEmailOtp(email);
     return ResponseEntity.ok(new NftResponse<>("OTP sent", null));
   }
