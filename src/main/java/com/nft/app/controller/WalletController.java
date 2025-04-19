@@ -44,7 +44,7 @@ public class WalletController {
   }
 
   @PostMapping("/api/v1/withdraw")
-  public ResponseEntity<NftResponse<Void>> deposit(@RequestBody WithdrawRequestDto withdrawRequestDto) {
+  public ResponseEntity<NftResponse<Void>> withdraw(@RequestBody WithdrawRequestDto withdrawRequestDto) {
     String email = getUserEmail();
     walletService.withdrawFund(email, withdrawRequestDto);
     return ResponseEntity.ok(new NftResponse<>("Withdraw request sent, " +

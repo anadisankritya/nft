@@ -21,7 +21,7 @@ public class RegisterController {
   private final UserService userService;
 
   @PostMapping("/api/v1/send-email-otp")
-  public ResponseEntity<NftResponse<String>> sendEmailOtp(@RequestParam String email) {
+  public ResponseEntity<NftResponse<Void>> sendEmailOtp(@RequestParam String email) {
     userService.sendEmailOtp(email);
     return ResponseEntity.ok(new NftResponse<>("OTP sent", null));
   }
