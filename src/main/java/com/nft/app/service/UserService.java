@@ -228,17 +228,17 @@ public class UserService {
   }
 
 
-  public void sendPasswordResetOtp(String email) {
-    log.info("inside UserService::sendPasswordResetOtp for email - {}", email);
-
-    getUser(email);
-
-    if (otpService.checkOtpRecentlySent(email, AppConstants.EMAIL)) {
-      log.info("Otp already sent");
-      return;
-    }
-    otpService.sendOtp(email, AppConstants.EMAIL);
-  }
+//  public void sendPasswordResetOtp(String email) {
+//    log.info("inside UserService::sendPasswordResetOtp for email - {}", email);
+//
+//    getUser(email);
+//
+//    if (otpService.checkOtpRecentlySent(email, AppConstants.EMAIL)) {
+//      log.info("Otp already sent");
+//      return;
+//    }
+//    otpService.sendOtp(email, AppConstants.EMAIL);
+//  }
 
   public void updatePassword(UserRequest userRequest) {
     String email = userRequest.email();
