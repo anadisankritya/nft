@@ -49,6 +49,13 @@ public class WalletService {
 
     User user = userService.getUser(email);
     Optional<WalletMaster> walletMasterOptional = walletMasterRepository.findById(user.getWalletId());
+    validateDepositRequest(fundDepositRequest, walletMasterOptional);
+    String walletName = walletMasterOptional.get().getWalletName();
+    DepositRequest depositRequest = new DepositRequest(user.getEmail(), walletName, fundDepositRequest);
+    depositRequestRepository.save(depositRequest);
+  }
+
+  private void validateDepositRequest(FundDepositRequest fundDepositRequest, Optional<WalletMaster> walletMasterOptional) {
     if (walletMasterOptional.isEmpty()) {
       throw new NftException(ErrorCode.WALLET_NOT_FOUND);
     }
@@ -56,9 +63,9 @@ public class WalletService {
     if (transactionIdUsed) {
       throw new NftException(ErrorCode.TRANSACTION_ID_ALREADY_PRESENT);
     }
-    String walletName = walletMasterOptional.get().getWalletName();
-    DepositRequest depositRequest = new DepositRequest(user.getEmail(), walletName, fundDepositRequest);
-    depositRequestRepository.save(depositRequest);
+    if (fundDepositRequest.amount() < 55) {
+      throw new NftException(ErrorCode.MIN_DEPOSIT_ERROR, AppConstants.MIN_DEPOSIT_AMT);
+    }
   }
 
   public void withdrawFund(String email, WithdrawRequestDto request) {
