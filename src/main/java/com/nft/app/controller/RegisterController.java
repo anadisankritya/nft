@@ -39,11 +39,11 @@ public class RegisterController {
         .body(new NftResponse<>("User registered", null));
   }
 
-  @PostMapping("/api/v1/reset-password")
-  public ResponseEntity<NftResponse<Void>> resetPassword(@RequestParam String email) {
-    userService.sendPasswordResetOtp(email);
-    return ResponseEntity.ok(new NftResponse<>("Password reset otp sent", null));
-  }
+//  @PostMapping("/api/v1/reset-password")
+//  public ResponseEntity<NftResponse<Void>> resetPassword(@RequestParam String email) {
+//    userService.sendPasswordResetOtp(email);
+//    return ResponseEntity.ok(new NftResponse<>("Otp sent", null));
+//  }
 
   @PostMapping("/api/v1/update-password")
   public ResponseEntity<NftResponse<Void>> updatePassword(@RequestBody UserRequest userRequest) {

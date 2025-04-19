@@ -43,10 +43,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
       "/nft/user/api/v1/login",
       "/nft/user/api/v1/regenerate-token",
       "/nft/user/api/v1/admin",
-      "/nft/register/api/v1/update-password",
-      "/nft/register/api/v1/reset-password"
-
-//      "/nft/**"
+      "/nft/register/api/v1/update-password"
   );
   public static final List<String> ADMIN_PANEL_LIST = List.of("admin", "ui", "css", "js");
 

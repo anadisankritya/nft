@@ -61,13 +61,11 @@ public class UserService {
   public void sendEmailOtp(String email) {
     log.info("inside UserService::sendEmailOtp for email - {}", email);
 
-    if (userRepository.findByEmail(email).isPresent()) {
-      throw new NftException(ErrorCode.EMAIL_ALREADY_EXISTS);
-    }
     if (otpService.checkOtpRecentlySent(email, AppConstants.EMAIL)) {
       log.info("Otp already sent");
       return;
     }
+
     otpService.sendOtp(email, AppConstants.EMAIL);
   }
 
