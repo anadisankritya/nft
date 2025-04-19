@@ -1,5 +1,6 @@
 package com.nft.app.entity;
 
+import com.nft.app.dto.request.WithdrawRequestDto;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
@@ -21,6 +22,8 @@ public class WithdrawRequest {
   private Double serviceCharge;
   private Double totalAmount;
   private String status;
+  private String network;
+  private String walletAddress;
   private String comment;
 
   @CreatedDate
@@ -29,11 +32,13 @@ public class WithdrawRequest {
   @LastModifiedDate
   private LocalDateTime updatedDate;
 
-  public WithdrawRequest(String email, Integer amount) {
+  public WithdrawRequest(String email, WithdrawRequestDto request) {
     this.email = email;
-    this.amount = amount;
+    this.amount = request.amount();
     this.serviceCharge = Math.ceil(0.05 * amount);
-    this.totalAmount = amount + serviceCharge;
+    this.totalAmount = this.amount + this.serviceCharge;
+    this.network = request.network();
+    this.walletAddress = request.walletAddress();
     this.status = "PENDING";
   }
 }

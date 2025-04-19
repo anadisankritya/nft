@@ -60,7 +60,7 @@ public class OtpService {
   public boolean checkOtpRecentlySent(String key, String type) {
     Optional<OtpDetails> otpDetails = otpRepository.findByTypeAndKey(type, key);
     return otpDetails.map(
-        details -> details.getUpdatedDate().isAfter(LocalDateTime.now().minusMinutes(15L))
+        details -> details.getUpdatedDate().isAfter(LocalDateTime.now().minusMinutes(10L))
     ).orElse(false);
   }
 }

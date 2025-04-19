@@ -60,6 +60,8 @@
                         <th>Amount</th>
                         <th>Service Charge</th>
                         <th>Total Amount</th>
+                        <th>Network</th>
+                        <th>Wallet Address</th>
                         <th>Status</th>
                         <th>Raised On</th>
                         <th>Comment</th>
@@ -170,6 +172,8 @@
             <td>${item.amount}</td>
             <td>${item.serviceCharge}</td>
             <td>${item.totalAmount}</td>
+            <td>${item.network}</td>
+            <td>${item.walletAddress}</td>
             <td><span class="badge bg-warning text-dark">${item.status}</span></td>
             <td>${new Date(item.createdDate).toLocaleString()}</td>
             <td>
@@ -196,6 +200,8 @@
                 <div><strong>Amount:</strong> ${item.amount}</div>
                 <div><strong>Service Charge:</strong> ${item.serviceCharge}</div>
                 <div><strong>Total:</strong> ${item.totalAmount}</div>
+                <div><strong>Network:</strong> ${item.network}</div>
+                <div><strong>Wallet Address:</strong> ${item.walletAddress}</div>
                 <div><strong>Status:</strong> <span class="badge bg-warning text-dark">${item.status}</span></div>
                 <div><strong>Raised On:</strong> ${new Date(item.createdDate).toLocaleString()}</div>
                 <div>

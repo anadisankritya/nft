@@ -2,6 +2,7 @@ package com.nft.app.controller;
 
 import com.nft.app.dto.NftResponse;
 import com.nft.app.dto.request.FundDepositRequest;
+import com.nft.app.dto.request.WithdrawRequestDto;
 import com.nft.app.dto.response.UserDetails;
 import com.nft.app.service.WalletService;
 import lombok.RequiredArgsConstructor;
@@ -43,10 +44,9 @@ public class WalletController {
   }
 
   @PostMapping("/api/v1/withdraw")
-  public ResponseEntity<NftResponse<Void>> deposit(@RequestParam(defaultValue = "0") Integer amount,
-                                                   @RequestParam(required = false) String otp) {
+  public ResponseEntity<NftResponse<Void>> deposit(@RequestBody WithdrawRequestDto withdrawRequestDto) {
     String email = getUserEmail();
-    walletService.withdrawFund(email, amount, otp);
+    walletService.withdrawFund(email, withdrawRequestDto);
     return ResponseEntity.ok(new NftResponse<>("Withdraw request sent, " +
         "your money will be credited in 72 hours", null));
   }

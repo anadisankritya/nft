@@ -2,6 +2,7 @@ package com.nft.app.service;
 
 import com.nft.app.constant.AppConstants;
 import com.nft.app.dto.request.FundDepositRequest;
+import com.nft.app.dto.request.WithdrawRequestDto;
 import com.nft.app.dto.response.UserDetails;
 import com.nft.app.entity.DepositRequest;
 import com.nft.app.entity.TransactionRecord;
@@ -60,18 +61,18 @@ public class WalletService {
     depositRequestRepository.save(depositRequest);
   }
 
-  public void withdrawFund(String email, Integer amount, String otp) {
-    log.info("inside WalletService::withdrawFund for email - {}, amount - {}", email, amount);
+  public void withdrawFund(String email, WithdrawRequestDto request) {
+    log.info("inside WalletService::withdrawFund for email - {}, amount - {}", email, request.amount());
     User user = userService.getUser(email);
 
     if (BooleanUtils.isTrue(UserService.appConfig.getOtpRequired())) {
-      otpService.verifyOtp(email, otp, AppConstants.EMAIL);
+      otpService.verifyOtp(email, request.otp(), AppConstants.EMAIL);
     }
 
     UserWallet userWallet = getUserWallet(email);
-    validateWithdrawRequest(email, amount, user, userWallet);
+    validateWithdrawRequest(email, request.amount(), user, userWallet);
 
-    WithdrawRequest withdrawRequest = new WithdrawRequest(email, amount);
+    WithdrawRequest withdrawRequest = new WithdrawRequest(email, request);
     updateWallet(email, -withdrawRequest.getTotalAmount(), "WITHDRAW");
     withdrawRequestRepository.save(withdrawRequest);
   }
@@ -201,7 +202,7 @@ public class WalletService {
     depositRequestRepository.save(depositRequest);
   }
 
-  public Page<?> getAllTransactions(String email, Pageable pageable) {
+  public Page<TransactionRecord> getAllTransactions(String email, Pageable pageable) {
     return transactionRecordRepository.findByEmailOrderByIdDesc(email, pageable);
   }
 
