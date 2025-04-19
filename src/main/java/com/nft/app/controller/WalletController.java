@@ -5,6 +5,7 @@ import com.nft.app.dto.request.FundDepositRequest;
 import com.nft.app.dto.request.WithdrawRequestDto;
 import com.nft.app.dto.response.UserDetails;
 import com.nft.app.service.WalletService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -44,7 +45,7 @@ public class WalletController {
   }
 
   @PostMapping("/api/v1/withdraw")
-  public ResponseEntity<NftResponse<Void>> withdraw(@RequestBody WithdrawRequestDto withdrawRequestDto) {
+  public ResponseEntity<NftResponse<Void>> withdraw(@RequestBody @Valid WithdrawRequestDto withdrawRequestDto) {
     String email = getUserEmail();
     walletService.withdrawFund(email, withdrawRequestDto);
     return ResponseEntity.ok(new NftResponse<>("Withdraw request sent, " +
