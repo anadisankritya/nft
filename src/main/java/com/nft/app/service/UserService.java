@@ -246,7 +246,9 @@ public class UserService {
     String email = userRequest.email();
     log.info("inside UserService::updatePassword for email - {}", email);
 
-    otpService.verifyOtp(email, userRequest.emailOtp(), AppConstants.EMAIL);
+    if (BooleanUtils.isTrue(appConfig.getOtpRequired())) {
+      otpService.verifyOtp(email, userRequest.emailOtp(), AppConstants.EMAIL);
+    }
 
     User user = getUser(email);
     user.setPassword(Base64Utils.encodeString(userRequest.password()));
