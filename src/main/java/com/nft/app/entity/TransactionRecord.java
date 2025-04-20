@@ -2,8 +2,11 @@ package com.nft.app.entity;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -20,6 +23,9 @@ public class TransactionRecord {
   private String type;
 
   private Integer txnNo;
+
+  @CreatedDate
+  private LocalDateTime createdDate;
 
   public TransactionRecord(String email, Double currentAmount, Double changeAmount, String type) {
     this.email = email;

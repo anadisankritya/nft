@@ -211,7 +211,7 @@ public class WalletService {
 
   public Page<TransactionRecord> getAllTransactions(String email, Pageable pageable) {
     Page<TransactionRecord> transactionRecords = transactionRecordRepository.findByEmailOrderByIdDesc(email, pageable);
-    int count = 0;
+    int count = (pageable.getPageNumber() * pageable.getPageSize()) + 1;
     for (TransactionRecord tr : transactionRecords.getContent()) {
       tr.setTxnNo(count++);
     }
