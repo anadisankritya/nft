@@ -19,6 +19,8 @@ public class TransactionRecord {
   private Double newBalance;
   private String type;
 
+  private Integer txnNo;
+
   public TransactionRecord(String email, Double currentAmount, Double changeAmount, String type) {
     this.email = email;
     this.previousBalance = currentAmount;

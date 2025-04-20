@@ -210,7 +210,12 @@ public class WalletService {
   }
 
   public Page<TransactionRecord> getAllTransactions(String email, Pageable pageable) {
-    return transactionRecordRepository.findByEmailOrderByIdDesc(email, pageable);
+    Page<TransactionRecord> transactionRecords = transactionRecordRepository.findByEmailOrderByIdDesc(email, pageable);
+    int count = 0;
+    for (TransactionRecord tr : transactionRecords.getContent()) {
+      tr.setTxnNo(count++);
+    }
+    return transactionRecords;
   }
 
 }
